@@ -2,9 +2,14 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>Tablero de Participación</title>
+  
+  <!-- ETIQUETAS PARA ACTIVAR PANTALLA COMPLETA EN IPHONE (iOS) -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Participación">
+
   <style>
     * {
       box-sizing: border-box;
@@ -14,10 +19,10 @@
       margin: 0;
       padding: 0;
       width: 100vw;
-      height: 100vh;
+      height: 100dvh; /* dvh se adapta al tamaño real de pantalla en móviles */
       overflow: hidden;
       background-color: #0f172a;
-      font-family: 'Segoe UI', Roboto, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       color: #f8fafc;
       user-select: none;
       display: flex;
@@ -26,7 +31,7 @@
 
     header {
       background-color: #1e293b;
-      padding: 6px 15px;
+      padding: 6px 10px;
       text-align: center;
       border-bottom: 2px solid #38bdf8;
       flex-shrink: 0;
@@ -34,27 +39,27 @@
 
     h1 {
       margin: 0;
-      font-size: 25px;
-      letter-spacing: 2px;
+      font-size: 20px;
+      letter-spacing: 1px;
     }
 
     .grid-container {
       display: grid;
       grid-template-columns: repeat(6, 1fr);
       grid-template-rows: repeat(4, 1fr);
-      gap: 8px;
-      padding: 10px;
+      gap: 6px;
+      padding: 6px;
       flex-grow: 1;
       width: 100%;
-      height: calc(100vh - 100px);
+      height: 100%;
       overflow: hidden;
     }
 
     .student-card {
       background-color: #1e293b;
-      border: 2px solid #334155;
-      border-radius: 8px;
-      padding: 8px 10px;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      padding: 4px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -66,7 +71,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 4px;
+      gap: 2px;
       width: 100%;
     }
 
@@ -74,7 +79,7 @@
       display: flex;
       flex-direction: row;
       align-items: center;
-      gap: 8px;
+      gap: 4px;
       width: 100%;
     }
 
@@ -82,18 +87,18 @@
       background-color: #38bdf8;
       color: #0f172a;
       font-weight: bold;
-      min-width: 32px;
-      height: 26px;
-      border-radius: 4px;
+      min-width: 24px;
+      height: 20px;
+      border-radius: 3px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 16px;
+      font-size: 13px;
       flex-shrink: 0;
     }
 
     .student-lastname {
-      font-size: 14px;
+      font-size: 11px;
       font-weight: bold;
       white-space: nowrap;
       overflow: hidden;
@@ -103,7 +108,7 @@
     }
 
     .student-name {
-      font-size: 17px;
+      font-size: 13px;
       font-weight: bold;
       white-space: nowrap;
       overflow: hidden;
@@ -113,19 +118,18 @@
       text-align: center;
     }
 
-    /* BOTÓN CON ALTURA FIJA PARA EVITAR APLASTAMIENTO */
     .check-btn {
       background-color: #0f172a;
       border: 1px solid #334155;
-      border-radius: 6px;
+      border-radius: 4px;
       color: #64748b;
-      height: 36px;
-      min-height: 36px;
+      height: 28px;
+      min-height: 28px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: bold;
-      font-size: 20px;
+      font-size: 16px;
       cursor: pointer;
       transition: all 0.2s ease;
       width: 100%;
@@ -157,7 +161,7 @@
     }
 
     footer {
-      padding: 8px;
+      padding: 4px;
       text-align: center;
       background-color: #0f172a;
       flex-shrink: 0;
@@ -167,11 +171,11 @@
       background-color: #ef4444;
       color: white;
       border: none;
-      padding: 6px 16px;
+      padding: 4px 12px;
       border-radius: 4px;
       cursor: pointer;
       font-weight: bold;
-      font-size: 16px;
+      font-size: 13px;
     }
     
     .reset-btn:hover {
