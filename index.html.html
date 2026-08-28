@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Tablero de Participación 1BGU</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    /* Ocupar el 100% de la pantalla sin barras de desplazamiento */
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background-color: #0f172a;
+      font-family: 'Segoe UI', Roboto, sans-serif;
+      color: #f8fafc;
+      user-select: none;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background-color: #1e293b;
+      padding: 10px 20px;
+      text-align: center;
+      border-bottom: 2px solid #38bdf8;
+      flex-shrink: 0;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 40px;
+      letter-spacing: 2px;
+    }
+
+    /* Grid que distribuye proporcionalmente las 24 tarjetas con filas de igual tamaño */
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      grid-template-rows: repeat(4, 1fr); /* Filas de igual altura (1 fracción cada una) */
+      gap: 10px;
+      padding: 12px;
+      flex-grow: 1;
+      width: 100%;
+      height: calc(100vh - 90px); /* Ajuste basado en header y footer */
+      overflow: hidden; /* Asegura que nada se salga del contenedor principal */
+    }
+
+    .student-card {
+      background-color: #1e293b;
+      border: 2px solid #334155;
+      border-radius: 8px;
+      padding: 10px 15px; /* Reducido para mejor ajuste en tamaño fijo */
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.2s ease;
+      overflow: hidden; /* Imprescindible para mantener tamaño fijo */
+    }
+
+    .card-header {
+      display: flex;
+      flex-direction: column; /* Apila elementos verticalmente */
+      align-items: center; /* Centra el contenido horizontalmente */
+      gap:25px; /* Espacio vertical reducido */
+      width: 100%;
+    }
+
+    .number-lastname-row {
+      display: flex;
+      flex-direction: row; /* Elementos en línea horizontal */
+      align-items: center; /* Centrado vertical */
+      gap: 10px;
+      width: 100%;
+    }
+
+    .student-number {
+      background-color: #38bdf8;
+      color: #0f172a;
+      font-weight: bold;
+      min-width: 35px; /* Ajustado */
+      height: 30px; /* Ajustado */
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 25px; /* Ajustado */
+      flex-shrink: 0;
+    }
+
+    .student-lastname {
+      font-size: 20px; /* Ajustado */
+      font-weight: bold;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: #38bdf8;
+      flex-grow: 1;
+    }
+
+    .student-name {
+      font-size: 40px; /* Reducido para que quepa en tamaño fijo */
+      font-weight: bold;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: #f1f5f9;
+      width: 100%;
+      text-align: center; /* Centra el nombre en su renglón */
+    }
+
+    .check-btn {
+      background-color: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      color: #64748b;
+      padding: 20px; /* Reducido */
+      text-align: center;
+      font-weight: bold;
+      font-size: 90px; /* Ajustado */
+      cursor: pointer;
+      transition: all 0.2s ease;
+      width: 100%;
+      margin-top: auto; /* Empuja el botón al fondo de la tarjeta */
+    }
+
+    .check-btn:hover {
+      border-color: #38bdf8;
+      color: #38bdf8;
+    }
+
+    .student-card.active {
+      border-color: #22c55e;
+      background-color: #064e3b;
+    }
+
+    .student-card.active .student-number {
+      background-color: #22c55e;
+    }
+    
+    .student-card.active .student-lastname {
+      color: #22c55e;
+    }
+
+    .student-card.active .check-btn {
+      background-color: #22c55e;
+      color: #0f172a;
+      border-color: #22c55e;
+    }
+
+    footer {
+      padding: 10px; /* Reducido */
+      text-align: center;
+      background-color: #0f172a;
+      flex-shrink: 0;
+    }
+
+    .reset-btn {
+      background-color: #ef4444;
+      color: white;
+      border: none;
+      padding: 4px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 20px; /* Ajustado */
+    }
+    
+    .reset-btn:hover {
+      background-color: #dc2626;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>REGISTRO DE PARTICIPACIÓN EN VIVO 1BGU</h1>
+  </header>
+
+  <div class="grid-container" id="grid"></div>
+
+  <footer>
+    <button class="reset-btn" onclick="resetAll()">Reiniciar Todo el Tablero</button>
+  </footer>
+
+  <script>
+    const alumnos = [
+      "ALBUJA, JUAN MARTIN",
+      "ANGULO, JUAN JOSÉ",
+      "BORJA, CAMILA RAPHAELA",
+      "CONTRERAS, SAMUEL",
+      "CORTÉS, BENJAMÍN",
+      "GALLARDO, EDUARDO NABILA",
+      "GONZÁLEZ, EMILIA",
+      "GUERRERO, LUCIANA",
+      "JARAMILLO, ALEGRÍA",
+      "LARREA, FIORELLA",
+      "LARREA, MATEO",
+      "LOOR, ALISSA SOPHIA",
+      "LÓPEZ, EMILIANO JOSÉ",
+      "MATA, CAYETANO",
+      "MELO, ABIGAIL MICAELA",
+      "MOLINA, NICOLÁS",
+      "SAMANIEGO, FERNANDA",
+      "SÁNCHEZ, RAPHAELLA CAROLINA",
+      "SANCHEZ, JOSÉ ALEJANDRO",
+      "SUÁREZ, PAULO",
+      "TOBAR, AGUSTÍN",
+      "TORRES, MATEO",
+      "TORRES, MARTINA",
+      "TRUJILLO, SEBASTIÁN MATEO"
+    ];
+
+    const grid = document.getElementById('grid');
+
+    alumnos.forEach((alumnoCompleto, index) => {
+      const [apellido, nombres] = alumnoCompleto.split(', ');
+      
+      const id = index + 1;
+      const numStr = id < 10 ? `0${id}` : id;
+      const card = document.createElement('div');
+      card.className = 'student-card';
+      card.id = `card-${id}`;
+      card.innerHTML = `
+        <div class="card-header">
+          <div class="number-lastname-row">
+            <div class="student-number">${numStr}</div>
+            <div class="student-lastname" title="${apellido}">${apellido}</div>
+          </div>
+          <div class="student-name" title="${nombres}">${nombres}</div>
+        </div>
+        <div class="check-btn" onclick="toggleStatus(${id})">
+          <span id="text-${id}">⏳</span>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+
+    function toggleStatus(id) {
+      const card = document.getElementById(`card-${id}`);
+      const text = document.getElementById(`text-${id}`);
+      
+      card.classList.toggle('active');
+      
+      if (card.classList.contains('active')) {
+        text.innerHTML = '✔';
+      } else {
+        text.innerHTML = '⏳';
+      }
+    }
+
+    function resetAll() {
+      for (let i = 1; i <= alumnos.length; i++) {
+        const card = document.getElementById(`card-${i}`);
+        const text = document.getElementById(`text-${i}`);
+        card.classList.remove('active');
+        text.innerHTML = '⏳';
+      }
+    }
+  </script>
+</body>
+</html>
