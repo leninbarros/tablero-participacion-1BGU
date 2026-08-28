@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Tablero de Participación</title>
   
-  <!-- COMPATIBILIDAD PANTALLA COMPLETA ANDROID / CHROME -->
+  <!-- ANDROID / CHROME CONFIGURACIÓN PWA -->
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="theme-color" content="#0f172a">
   <link rel="manifest" href="data:application/manifest+json;utf8,{%22name%22:%22Participacion%201BGU%22,%22short_name%22:%22Participacion%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%230f172a%22,%22theme_color%22:%22%230f172a%22}">
 
-  <!-- COMPATIBILIDAD PANTALLA COMPLETA IPHONE / SAFARI -->
+  <!-- IPHONE / SAFARI CONFIGURACIÓN PWA -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Participación">
@@ -48,7 +48,6 @@
       letter-spacing: 1px;
     }
 
-    /* Grilla adaptable: 6 columnas en horizontal/PC, 3 columnas en celulares verticales */
     .grid-container {
       display: grid;
       grid-template-columns: repeat(6, 1fr);
@@ -61,7 +60,6 @@
       overflow: hidden;
     }
 
-    /* Ajuste para pantallas verticales de celulares Android */
     @media (max-aspect-ratio: 1/1) {
       .grid-container {
         grid-template-columns: repeat(3, 1fr);
@@ -263,6 +261,7 @@
     });
 
     function toggleStatus(id) {
+      activarPantallaCompleta();
       const card = document.getElementById(`card-${id}`);
       const text = document.getElementById(`text-${id}`);
       
@@ -283,6 +282,18 @@
         text.innerHTML = '⏳';
       }
     }
+
+    /* Oculta la barra de navegación en Android al hacer el primer toque */
+    function activarPantallaCompleta() {
+      const doc = document.documentElement;
+      if (doc.requestFullscreen) {
+        doc.requestFullscreen().catch(() => {});
+      } else if (doc.webkitRequestFullscreen) {
+        doc.webkitRequestFullscreen().catch(() => {});
+      }
+    }
+
+    document.body.addEventListener('click', activarPantallaCompleta, { once: true });
   </script>
 </body>
 </html>
