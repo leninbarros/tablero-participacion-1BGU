@@ -109,11 +109,9 @@
       flex-shrink: 0;
     }
 
-    /* =========================================================
-       AQUÍ CAMBIAS EL TAMAÑO DE LA LETRA DEL APELLIDO
-       ========================================================= */
+    /* TAMAÑO DE LETRA DEL APELLIDO */
     .student-lastname {
-      font-size: 12px; /* <-- MODIFICA ESTE VALOR (ej: 12px, 13px) */
+      font-size: 11px;
       font-weight: bold;
       white-space: nowrap;
       overflow: hidden;
@@ -122,11 +120,9 @@
       flex-grow: 1;
     }
 
-    /* =========================================================
-       AQUÍ CAMBIAS EL TAMAÑO DE LA LETRA DEL NOMBRE
-       ========================================================= */
+    /* TAMAÑO DE LETRA DEL NOMBRE */
     .student-name {
-      font-size: 20px; /* <-- MODIFICA ESTE VALOR (ej: 14px, 15px) */
+      font-size: 12px;
       font-weight: bold;
       white-space: nowrap;
       overflow: hidden;
@@ -147,7 +143,7 @@
       align-items: center;
       justify-content: center;
       font-weight: bold;
-      font-size: 15px;
+      font-size: 16px;
       cursor: pointer;
       transition: all 0.2s ease;
       width: 100%;
@@ -159,23 +155,29 @@
       color: #38bdf8;
     }
 
-    .student-card.active {
-      border-color: #22c55e;
-      background-color: #064e3b;
+    /* ESTILOS AL MARCAR COMO CUMPLIDO */
+    .student-card.active-H {
+      border-color: #0284c7;
+      background-color: #0c4a6e;
+    }
+    .student-card.active-H .student-number { background-color: #38bdf8; }
+    .student-card.active-H .student-lastname { color: #38bdf8; }
+    .student-card.active-H .check-btn {
+      background-color: #0284c7;
+      color: #ffffff;
+      border-color: #38bdf8;
     }
 
-    .student-card.active .student-number {
-      background-color: #22c55e;
+    .student-card.active-M {
+      border-color: #ec4899;
+      background-color: #831843;
     }
-    
-    .student-card.active .student-lastname {
-      color: #22c55e;
-    }
-
-    .student-card.active .check-btn {
-      background-color: #22c55e;
-      color: #0f172a;
-      border-color: #22c55e;
+    .student-card.active-M .student-number { background-color: #f472b6; }
+    .student-card.active-M .student-lastname { color: #f472b6; }
+    .student-card.active-M .check-btn {
+      background-color: #ec4899;
+      color: #ffffff;
+      border-color: #f472b6;
     }
 
     footer {
@@ -219,42 +221,51 @@
     }
 
     const alumnos = [
-      "ALBUJA, JUAN MARTIN",
-      "ANGULO, JUAN JOSE",
-      "BORJA, CAMILA RAPHAELA",
-      "CONTRERAS, SAMUEL ESTEBAN",
-      "CORTÉS, JOSUÉ BENJAMÍN",
-      "GALLARDO, EDUARDO NABILA",
-      "GONZÁLEZ, EMILIA",
-      "GUERRERO, LUCIANA",
-      "JARAMILLO, ALEGRÍA RAFAELA",
-      "LARREA, FIORELLA",
-      "LARREA, RAFAEL MATEO",
-      "LOOR, ALISSA SOPHIA",
-      "LÓPEZ, EMILIANO JOSÉ",
-      "MATA, CAYETANO",
-      "MELO, ABIGAIL MICAELA",
-      "MOLINA, NICOLÁS",
-      "SAMANIEGO, FERNANDA ESTEFANIA",
-      "SÁNCHEZ, RAPHAELLA CAROLINA",
-      "SANCHEZ, JOSE ALEJANDRO",
-      "SUÁREZ, PAULO",
-      "AGUSTÍN, TOBAR CABRERA",
-      "TORRES, MATEO",
-      "TORRES, MARTINA SOLÉ",
-      "TRUJILLO, SEBASTIÁN MATEO"
+      { nombre: "ALBUJA, JUAN MARTIN", genero: "H" },
+      { nombre: "ANGULO, JUAN JOSE", genero: "H" },
+      { nombre: "BORJA, CAMILA RAPHAELA", genero: "M" },
+      { nombre: "CONTRERAS, SAMUEL ESTEBAN", genero: "H" },
+      { nombre: "CORTÉS, JOSUÉ BENJAMÍN", genero: "H" },
+      { nombre: "GALLARDO, EDUARDO NABILA", genero: "H" },
+      { nombre: "GONZÁLEZ, EMILIA", genero: "M" },
+      { nombre: "GUERRERO, LUCIANA", genero: "M" },
+      { nombre: "JARAMILLO, ALEGRÍA RAFAELA", genero: "M" },
+      { nombre: "LARREA, FIORELLA", genero: "M" },
+      { nombre: "LARREA, RAFAEL MATEO", genero: "H" },
+      { nombre: "LOOR, ALISSA SOPHIA", genero: "M" },
+      { nombre: "LÓPEZ, EMILIANO JOSÉ", genero: "H" },
+      { nombre: "MATA, CAYETANO", genero: "H" },
+      { nombre: "MELO, ABIGAIL MICAELA", genero: "M" },
+      { nombre: "MOLINA, NICOLÁS", genero: "H" },
+      { nombre: "SAMANIEGO, FERNANDA ESTEFANIA", genero: "M" },
+      { nombre: "SÁNCHEZ, RAPHAELLA CAROLINA", genero: "M" },
+      { nombre: "SANCHEZ, JOSE ALEJANDRO", genero: "H" },
+      { nombre: "SUÁREZ, PAULO", genero: "H" },
+      { nombre: "AGUSTÍN, TOBAR CABRERA", genero: "H" },
+      { nombre: "TORRES, MATEO", genero: "H" },
+      { nombre: "TORRES, MARTINA SOLÉ", genero: "M" },
+      { nombre: "TRUJILLO, SEBASTIÁN MATEO", genero: "H" }
     ];
+
+    /* SÍMBOLOS ALQUÍMICOS ELEGANTES */
+    const ICONO_HOMBRE = "♂";
+    const ICONO_MUJER = "♀";
+    const ICONO_CHECK = "✔";
 
     const grid = document.getElementById('grid');
 
-    alumnos.forEach((alumnoCompleto, index) => {
-      const [apellido, nombres] = alumnoCompleto.split(', ');
+    alumnos.forEach((alumno, index) => {
+      const [apellido, nombres] = alumno.nombre.split(', ');
       
       const id = index + 1;
       const numStr = id < 10 ? `0${id}` : id;
       const card = document.createElement('div');
       card.className = 'student-card';
       card.id = `card-${id}`;
+      card.dataset.genero = alumno.genero;
+
+      const iconoInicial = alumno.genero === "H" ? ICONO_HOMBRE : ICONO_MUJER;
+
       card.innerHTML = `
         <div class="card-header">
           <div class="number-lastname-row">
@@ -264,7 +275,7 @@
           <div class="student-name" title="${nombres}">${nombres}</div>
         </div>
         <div class="check-btn" onclick="toggleStatus(${id})">
-          <span id="text-${id}">⏳</span>
+          <span id="text-${id}">${iconoInicial}</span>
         </div>
       `;
       grid.appendChild(card);
@@ -273,23 +284,26 @@
     function toggleStatus(id) {
       const card = document.getElementById(`card-${id}`);
       const text = document.getElementById(`text-${id}`);
+      const genero = card.dataset.genero;
+      const claseActiva = `active-${genero}`;
       
-      card.classList.toggle('active');
+      const estaActiva = card.classList.toggle(claseActiva);
       
-      if (card.classList.contains('active')) {
-        text.innerHTML = '✔';
+      if (estaActiva) {
+        text.innerHTML = ICONO_CHECK;
       } else {
-        text.innerHTML = '⏳';
+        text.innerHTML = genero === "H" ? ICONO_HOMBRE : ICONO_MUJER;
       }
     }
 
     function resetAll() {
-      for (let i = 1; i <= alumnos.length; i++) {
-        const card = document.getElementById(`card-${i}`);
-        const text = document.getElementById(`text-${i}`);
-        card.classList.remove('active');
-        text.innerHTML = '⏳';
-      }
+      alumnos.forEach((alumno, index) => {
+        const id = index + 1;
+        const card = document.getElementById(`card-${id}`);
+        const text = document.getElementById(`text-${id}`);
+        card.classList.remove('active-H', 'active-M');
+        text.innerHTML = alumno.genero === "H" ? ICONO_HOMBRE : ICONO_MUJER;
+      });
     }
   </script>
 </body>
