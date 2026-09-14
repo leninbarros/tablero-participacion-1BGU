@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Tablero de Participación</title>
+  <title>Tablero de Participación y Grupos</title>
   
   <!-- ANDROID CHROME CONFIGURACIÓN PWA -->
   <meta name="mobile-web-app-capable" content="yes">
@@ -66,7 +66,7 @@
       }
     }
 
-    /* TODA LA TARJETA ES EL BOTÓN DE ACTIVACIÓN */
+    /* ESTILO BASE DE LA TARJETA (PROMEDIO / SIN COLOR) */
     .student-card {
       background-color: #1e293b;
       border: 1px solid #334155;
@@ -84,6 +84,39 @@
 
     .student-card:hover {
       border-color: #38bdf8;
+      filter: brightness(1.1);
+    }
+
+    /* CATEGORÍA: AVANZADO (AMARILLO) */
+    .student-card.cat-avanzado {
+      background-color: #422006;
+      border-color: #eab308;
+    }
+    .student-card.cat-avanzado .student-number {
+      background-color: #eab308;
+      color: #0f172a;
+    }
+    .student-card.cat-avanzado .student-lastname {
+      color: #fde047;
+    }
+
+    /* CATEGORÍA: NECESITA AYUDA (ROSADO) */
+    .student-card.cat-ayuda {
+      background-color: #831843;
+      border-color: #ec4899;
+    }
+    .student-card.cat-ayuda .student-number {
+      background-color: #ec4899;
+      color: #ffffff;
+    }
+    .student-card.cat-ayuda .student-lastname {
+      color: #f472b6;
+    }
+
+    /* ESTADO AL HACER CLICK (MARCADO EN CLASE) */
+    .student-card.checked {
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.6);
+      border-color: #38bdf8 !important;
     }
 
     .number-lastname-row {
@@ -108,7 +141,6 @@
       flex-shrink: 0;
     }
 
-    /* TAMAÑO DE LETRA DEL APELLIDO */
     .student-lastname {
       font-size: 12px;
       font-weight: bold;
@@ -119,7 +151,6 @@
       flex-grow: 1;
     }
 
-    /* TAMAÑO DE LETRA DEL NOMBRE */
     .student-name {
       font-size: 18px;
       font-weight: bold;
@@ -130,21 +161,6 @@
       width: 100%;
       text-align: center;
     }
-
-    /* ESTILOS AL MARCAR COMO CUMPLIDO (HOMBRES / MUJERES) */
-    .student-card.active-H {
-      border-color: #0284c7;
-      background-color: #0c4a6e;
-    }
-    .student-card.active-H .student-number { background-color: #38bdf8; }
-    .student-card.active-H .student-lastname { color: #38bdf8; }
-
-    .student-card.active-M {
-      border-color: #ec4899;
-      background-color: #831843;
-    }
-    .student-card.active-M .student-number { background-color: #f472b6; }
-    .student-card.active-M .student-lastname { color: #f472b6; }
 
     footer {
       padding: 4px;
@@ -172,13 +188,13 @@
 <body>
 
   <header>
-    <h1>REGISTRO DE PARTICIPACIÓN EN VIVO 1 BGU</h1>
+    <h1>REGISTRO DE PARTICIPACIÓN - 1 BGU</h1>
   </header>
 
   <div class="grid-container" id="grid"></div>
 
   <footer>
-    <button class="reset-btn" onclick="resetAll()">Reiniciar Todo el Tablero</button>
+    <button class="reset-btn" onclick="resetAll()">Limpiar Selecciones</button>
   </footer>
 
   <script>
@@ -186,40 +202,45 @@
       navigator.serviceWorker.register('sw.js').catch(() => {});
     }
 
+    /* 
+      PUEDES CAMBIAR LA CATEGORÍA A MANO AQUÍ:
+      - "avanzado" (Se pintará de amarillo)
+      - "ayuda" (Se pintará de rosado)
+      - "promedio" (Sin color predeterminado)
+    */
     const alumnos = [
-      { nombre: "ALBUJA, JUAN MARTIN", genero: "H" },
-      { nombre: "ANGULO, JUAN JOSE", genero: "H" },
-      { nombre: "BORJA, CAMILA RAPHAELA", genero: "M" },
-      { nombre: "CONTRERAS, SAMUEL", genero: "H" },
-      { nombre: "CORTÉS, BENJAMÍN", genero: "H" },
-      { nombre: "GALLARDO, NABILA", genero: "H" },
-      { nombre: "GONZÁLEZ, EMILIA", genero: "M" },
-      { nombre: "GUERRERO, LUCIANA", genero: "M" },
-      { nombre: "JARAMILLO, ALEGRÍA", genero: "M" },
-      { nombre: "LARREA, FIORELLA", genero: "M" },
-      { nombre: "LARREA, MATEO", genero: "H" },
-      { nombre: "LOOR, ALISSA SOPHIA", genero: "M" },
-      { nombre: "LÓPEZ, EMILIANO JOSÉ", genero: "H" },
-      { nombre: "MATA, CAYETANO", genero: "H" },
-      { nombre: "MELO, ABIGAIL MICAELA", genero: "M" },
-      { nombre: "MOLINA, NICOLÁS", genero: "H" },
-      { nombre: "SAMANIEGO, FERNANDA", genero: "M" },
-      { nombre: "SÁNCHEZ, RAPHAELLA CAROLINA", genero: "M" },
-      { nombre: "SANCHEZ, JOSE ALEJANDRO", genero: "H" },
-      { nombre: "SUÁREZ, PAULO", genero: "H" },
-      { nombre: "TOBAR, AGUSTÍN", genero: "H" },
-      { nombre: "TORRES, MATEO", genero: "H" },
-      { nombre: "TORRES, MARTINA", genero: "M" },
-      { nombre: "TRUJILLO, SEBASTIÁN MATEO", genero: "H" }
+      { nombre: "ALBUJA, JUAN MARTIN", categoria: "avanzado" },
+      { nombre: "ANGULO, JUAN JOSE", categoria: "promedio" },
+      { nombre: "BORJA, CAMILA RAPHAELA", categoria: "ayuda" },
+      { nombre: "CONTRERAS, SAMUEL", categoria: "promedio" },
+      { nombre: "CORTÉS, BENJAMÍN", categoria: "avanzado" },
+      { nombre: "GALLARDO, NABILA", categoria: "promedio" },
+      { nombre: "GONZÁLEZ, EMILIA", categoria: "ayuda" },
+      { nombre: "GUERRERO, LUCIANA", categoria: "promedio" },
+      { nombre: "JARAMILLO, ALEGRÍA", categoria: "avanzado" },
+      { nombre: "LARREA, FIORELLA", categoria: "promedio" },
+      { nombre: "LARREA, MATEO", categoria: "promedio" },
+      { nombre: "LOOR, ALISSA SOPHIA", categoria: "ayuda" },
+      { nombre: "LÓPEZ, EMILIANO JOSÉ", categoria: "promedio" },
+      { nombre: "MATA, CAYETANO", categoria: "avanzado" },
+      { nombre: "MELO, ABIGAIL MICAELA", categoria: "promedio" },
+      { nombre: "MOLINA, NICOLÁS", categoria: "promedio" },
+      { nombre: "SAMANIEGO, FERNANDA", categoria: "ayuda" },
+      { nombre: "SÁNCHEZ, RAPHAELLA CAROLINA", categoria: "avanzado" },
+      { nombre: "SANCHEZ, JOSE ALEJANDRO", categoria: "promedio" },
+      { nombre: "SUÁREZ, PAULO", categoria: "promedio" },
+      { nombre: "TOBAR, AGUSTÍN", categoria: "ayuda" },
+      { nombre: "TORRES, MATEO", categoria: "promedio" },
+      { nombre: "TORRES, MARTINA", categoria: "avanzado" },
+      { nombre: "TRUJILLO, SEBASTIÁN MATEO", categoria: "promedio" }
     ];
 
     const grid = document.getElementById('grid');
 
-    // Función para abreviar el segundo nombre (si tiene más de una palabra)
+    // Función para abreviar el segundo nombre (ej: JUAN MARTIN -> JUAN M.)
     function formatearNombre(nombresStr) {
       const partes = nombresStr.trim().split(/\s+/);
       if (partes.length > 1) {
-        // Dejar el primer nombre intacto y la inicial del segundo con un punto
         return `${partes[0]} ${partes[1].charAt(0)}.`;
       }
       return nombresStr;
@@ -232,11 +253,12 @@
       const id = index + 1;
       const numStr = id < 10 ? `0${id}` : id;
       const card = document.createElement('div');
-      card.className = 'student-card';
-      card.id = `card-${id}`;
-      card.dataset.genero = alumno.genero;
       
-      // Toda la tarjeta activa la función al hacer clic
+      // Asigna la clase de categoría correspondiente de forma automática
+      const catClass = `cat-${alumno.categoria || 'promedio'}`;
+      card.className = `student-card ${catClass}`;
+      card.id = `card-${id}`;
+      
       card.setAttribute('onclick', `toggleStatus(${id})`);
 
       card.innerHTML = `
@@ -251,18 +273,15 @@
 
     function toggleStatus(id) {
       const card = document.getElementById(`card-${id}`);
-      const genero = card.dataset.genero;
-      const claseActiva = `active-${genero}`;
-      
-      // Alterna el estado de activación en toda la tarjeta
-      card.classList.toggle(claseActiva);
+      // Alterna un borde brillante al hacer clic para indicar participación activa
+      card.classList.toggle('checked');
     }
 
     function resetAll() {
-      alumnos.forEach((alumno, index) => {
+      alumnos.forEach((_, index) => {
         const id = index + 1;
         const card = document.getElementById(`card-${id}`);
-        card.classList.remove('active-H', 'active-M');
+        card.classList.remove('checked');
       });
     }
   </script>
