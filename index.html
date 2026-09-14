@@ -66,16 +66,22 @@
       }
     }
 
+    /* AHORA TODA LA TARJETA ES EL BOTÓN */
     .student-card {
       background-color: #1e293b;
       border: 1px solid #334155;
       border-radius: 6px;
-      padding: 4px;
+      padding: 6px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       transition: all 0.2s ease;
       overflow: hidden;
+      cursor: pointer; /* Muestra la manito al pasar el ratón */
+    }
+
+    .student-card:hover {
+      border-color: #38bdf8;
     }
 
     .card-header {
@@ -131,7 +137,8 @@
       text-align: center;
     }
 
-    .check-btn {
+    /* INDICADOR INFERIOR (AHORA MUESTRA EL ICONO DE ESTADO DE FORMA LIMPIA) */
+    .status-indicator {
       background-color: #0f172a;
       border: 1px solid #334155;
       border-radius: 4px;
@@ -143,15 +150,9 @@
       justify-content: center;
       font-weight: bold;
       font-size: 16px;
-      cursor: pointer;
       transition: all 0.2s ease;
       width: 100%;
       flex-shrink: 0;
-    }
-
-    .check-btn:hover {
-      border-color: #38bdf8;
-      color: #38bdf8;
     }
 
     /* ESTILOS AL MARCAR COMO CUMPLIDO */
@@ -161,7 +162,7 @@
     }
     .student-card.active-H .student-number { background-color: #38bdf8; }
     .student-card.active-H .student-lastname { color: #38bdf8; }
-    .student-card.active-H .check-btn {
+    .student-card.active-H .status-indicator {
       background-color: #0284c7;
       color: #ffffff;
       border-color: #38bdf8;
@@ -173,7 +174,7 @@
     }
     .student-card.active-M .student-number { background-color: #f472b6; }
     .student-card.active-M .student-lastname { color: #f472b6; }
-    .student-card.active-M .check-btn {
+    .student-card.active-M .status-indicator {
       background-color: #ec4899;
       color: #ffffff;
       border-color: #f472b6;
@@ -262,6 +263,9 @@
       card.className = 'student-card';
       card.id = `card-${id}`;
       card.dataset.genero = alumno.genero;
+      
+      /* AQUÍ ESTÁ EL CAMBIO PRINCIPAL: El evento onclick está en toda la tarjeta */
+      card.setAttribute('onclick', `toggleStatus(${id})`);
 
       const iconoInicial = alumno.genero === "H" ? ICONO_HOMBRE : ICONO_MUJER;
 
@@ -273,7 +277,7 @@
           </div>
           <div class="student-name" title="${nombres}">${nombres}</div>
         </div>
-        <div class="check-btn" onclick="toggleStatus(${id})">
+        <div class="status-indicator">
           <span id="text-${id}">${iconoInicial}</span>
         </div>
       `;
