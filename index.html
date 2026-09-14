@@ -102,20 +102,20 @@
       color: #713f12;
     }
 
-    /* CATEGORÍA: NECESITA AYUDA (FONDO ROSADO) */
+    /* CATEGORÍA: NECESITA AYUDA (FONDO VERDE ESMERALDA) */
     .student-card.cat-ayuda {
-      background-color: #fbcfe8;
-      border-color: #ec4899;
+      background-color: #a7f3d0;
+      border-color: #10b981;
     }
     .student-card.cat-ayuda .student-number {
-      background-color: #db2777;
-      color: #fdf2f8;
+      background-color: #047857;
+      color: #ecfdf5;
     }
     .student-card.cat-ayuda .student-lastname {
-      color: #9d174d;
+      color: #065f46;
     }
     .student-card.cat-ayuda .student-name {
-      color: #831843;
+      color: #022c22;
     }
 
     /* ESTADO CUANDO YA FUERON SELECCIONADOS / AGRUPADOS (GRIS Y OPACO) */
@@ -220,7 +220,7 @@
     /* 
       CATEGORÍAS MANUALES:
       - "avanzado" (Fondo amarillo)
-      - "ayuda" (Fondo rosado)
+      - "ayuda" (Fondo verde esmeralda)
       - "promedio" (Fondo normal sin color)
     */
     const alumnos = [
@@ -287,7 +287,6 @@
 
     function toggleStatus(id) {
       const card = document.getElementById(`card-${id}`);
-      // Alterna el estado "usado" (gris y opaco) al hacer clic
       card.classList.toggle('used');
     }
 
