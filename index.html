@@ -39,6 +39,9 @@
       text-align: center;
       border-bottom: 2px solid #38bdf8;
       flex-shrink: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
     h1 {
@@ -120,7 +123,7 @@
       color: #713f12;
     }
 
-    /* CATEGORÍA: NECESITA AYUDA (FONDO VIOLETA / MORADO - COMPLEMENTARIO) */
+    /* CATEGORÍA: NECESITA AYUDA (FONDO VIOLETA / MORADO) */
     .student-card.cat-ayuda {
       background-color: #e9d5ff;
       border-color: #a855f7;
@@ -199,26 +202,142 @@
     }
 
     footer {
-      padding: 4px;
+      padding: 6px 10px;
       text-align: center;
       background-color: #0f172a;
       flex-shrink: 0;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .action-btn {
+      border: none;
+      padding: 6px 14px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
     }
 
     .reset-btn {
       background-color: #ef4444;
       color: white;
-      border: none;
-      padding: 4px 12px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-weight: bold;
-      font-size: 13px;
     }
-    
     .reset-btn:hover {
       background-color: #dc2626;
     }
+
+    .group-btn {
+      background-color: #0284c7;
+      color: white;
+    }
+    .group-btn:hover {
+      background-color: #0369a1;
+    }
+
+    /* MODAL DE GRUPOS */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100dvh;
+      background: rgba(15, 23, 42, 0.85);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-content {
+      background-color: #1e293b;
+      border: 2px solid #38bdf8;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 600px;
+      max-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      padding: 16px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #334155;
+      padding-bottom: 8px;
+      margin-bottom: 12px;
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      font-size: 18px;
+      color: #38bdf8;
+    }
+
+    .close-modal {
+      background: none;
+      border: none;
+      color: #94a3b8;
+      font-size: 20px;
+      cursor: pointer;
+    }
+    .close-modal:hover {
+      color: #fff;
+    }
+
+    .modal-body {
+      overflow-y: auto;
+      flex-grow: 1;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 10px;
+      padding-right: 4px;
+    }
+
+    .group-card {
+      background-color: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      padding: 10px;
+    }
+
+    .group-card h3 {
+      margin: 0 0 6px 0;
+      font-size: 14px;
+      color: #facc15;
+      border-bottom: 1px solid #1e293b;
+      padding-bottom: 4px;
+    }
+
+    .group-member {
+      font-size: 13px;
+      padding: 3px 0;
+      display: flex;
+      justify-content: space-between;
+    }
+    .member-role {
+      font-size: 11px;
+      padding: 1px 5px;
+      border-radius: 3px;
+    }
+    .role-ayuda { background-color: #7e22ce; color: #f3e8ff; }
+    .role-avanzado { background-color: #ca8a04; color: #fef08a; }
+    .role-promedio { background-color: #475569; color: #f8fafc; }
   </style>
 </head>
 <body>
@@ -230,45 +349,53 @@
   <div class="grid-container" id="grid"></div>
 
   <footer>
-    <button class="reset-btn" onclick="resetAll()">Restaurar Todo el Tablero</button>
+    <button class="action-btn group-btn" onclick="generarGrupos()">✨ Crear Grupos Automáticos</button>
+    <button class="action-btn reset-btn" onclick="resetAll()">Restaurar Todo el Tablero</button>
   </footer>
+
+  <!-- MODAL PARA MOSTRAR LOS GRUPOS -->
+  <div class="modal-overlay" id="modalGrupos">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Equipos de Trabajo Optimizados</h2>
+        <button class="close-modal" onclick="cerrarModal()">×</button>
+      </div>
+      <div class="modal-body" id="modalBodyGrupos">
+        <!-- Los grupos se inyectarán aquí -->
+      </div>
+    </div>
+  </div>
 
   <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('sw.js').catch(() => {});
     }
 
-    /* 
-      CATEGORÍAS MANUALES:
-      - "avanzado" (Fondo amarillo + estrella grande)
-      - "ayuda" (Fondo violeta / morado)
-      - "promedio" (Fondo normal sin color)
-    */
     const alumnos = [
-      { nombre: "ALBUJA, JUAN MARTIN", categoria: "ayuda" },
-      { nombre: "ANGULO, JUAN JOSE", categoria: "avanzado" },
-      { nombre: "BORJA, CAMILA RAPHAELA", categoria: "ayuda" },
-      { nombre: "CONTRERAS, SAMUEL", categoria: "avanzado" },
-      { nombre: "CORTÉS, BENJAMÍN", categoria: "promedio" },
-      { nombre: "GALLARDO, NABILA", categoria: "ayuda" },
-      { nombre: "GONZÁLEZ, EMILIA", categoria: "avanzado" },
-      { nombre: "GUERRERO, LUCIANA", categoria: "avanzado" },
-      { nombre: "JARAMILLO, ALEGRÍA", categoria: "ayuda" },
-      { nombre: "LARREA, FIORELLA", categoria: "ayuda" },
-      { nombre: "LARREA, MATEO", categoria: "avanzado" },
-      { nombre: "LOOR, ALISSA SOPHIA", categoria: "promedio" },
-      { nombre: "LÓPEZ, EMILIANO JOSÉ", categoria: "promedio" },
-      { nombre: "MATA, CAYETANO", categoria: "promedio" },
-      { nombre: "MELO, ABIGAIL MICAELA", categoria: "ayuda" },
-      { nombre: "MOLINA, NICOLÁS", categoria: "promedio" },
-      { nombre: "SAMANIEGO, FERNANDA", categoria: "promedio" },
-      { nombre: "SÁNCHEZ, RAPHAELLA CAROLINA", categoria: "ayuda" },
-      { nombre: "SANCHEZ, JOSE ALEJANDRO", categoria: "avanzado" },
-      { nombre: "SUÁREZ, PAULO", categoria: "avanzado" },
-      { nombre: "TOBAR, AGUSTÍN", categoria: "ayuda" },
-      { nombre: "TORRES, MATEO", categoria: "promedio" },
-      { nombre: "TORRES, MARTINA", categoria: "avanzado" },
-      { nombre: "TRUJILLO, SEBASTIÁN MATEO", categoria: "ayuda" }
+      { id: 1, nombre: "ALBUJA, JUAN MARTIN", categoria: "ayuda" },
+      { id: 2, nombre: "ANGULO, JUAN JOSE", categoria: "avanzado" },
+      { id: 3, nombre: "BORJA, CAMILA RAPHAELA", categoria: "ayuda" },
+      { id: 4, nombre: "CONTRERAS, SAMUEL", categoria: "avanzado" },
+      { id: 5, nombre: "CORTÉS, BENJAMÍN", categoria: "promedio" },
+      { id: 6, nombre: "GALLARDO, NABILA", categoria: "ayuda" },
+      { id: 7, nombre: "GONZÁLEZ, EMILIA", categoria: "avanzado" },
+      { id: 8, nombre: "GUERRERO, LUCIANA", categoria: "avanzado" },
+      { id: 9, nombre: "JARAMILLO, ALEGRÍA", categoria: "ayuda" },
+      { id: 10, nombre: "LARREA, FIORELLA", categoria: "ayuda" },
+      { id: 11, nombre: "LARREA, MATEO", categoria: "avanzado" },
+      { id: 12, nombre: "LOOR, ALISSA SOPHIA", categoria: "promedio" },
+      { id: 13, nombre: "LÓPEZ, EMILIANO JOSÉ", categoria: "promedio" },
+      { id: 14, nombre: "MATA, CAYETANO", categoria: "promedio" },
+      { id: 15, nombre: "MELO, ABIGAIL MICAELA", categoria: "ayuda" },
+      { id: 16, nombre: "MOLINA, NICOLÁS", categoria: "promedio" },
+      { id: 17, nombre: "SAMANIEGO, FERNANDA", categoria: "promedio" },
+      { id: 18, nombre: "SÁNCHEZ, RAPHAELLA CAROLINA", categoria: "ayuda" },
+      { id: 19, nombre: "SANCHEZ, JOSE ALEJANDRO", categoria: "avanzado" },
+      { id: 20, nombre: "SUÁREZ, PAULO", categoria: "avanzado" },
+      { id: 21, nombre: "TOBAR, AGUSTÍN", categoria: "ayuda" },
+      { id: 22, nombre: "TORRES, MATEO", categoria: "promedio" },
+      { id: 23, nombre: "TORRES, MARTINA", categoria: "avanzado" },
+      { id: 24, nombre: "TRUJILLO, SEBASTIÁN MATEO", categoria: "ayuda" }
     ];
 
     const grid = document.getElementById('grid');
@@ -281,19 +408,18 @@
       return nombresStr;
     }
 
-    alumnos.forEach((alumno, index) => {
+    // Renderizar tarjetas iniciales
+    alumnos.forEach((alumno) => {
       const [apellido, nombresOriginales] = alumno.nombre.split(', ');
       const nombresFormateados = formatearNombre(nombresOriginales);
       
-      const id = index + 1;
-      const numStr = id < 10 ? `0${id}` : id;
+      const numStr = alumno.id < 10 ? `0${alumno.id}` : alumno.id;
       const card = document.createElement('div');
       
-      const catClass = `cat-${alumno.categoria || 'promedio'}`;
+      const catClass = `cat-${alumno.categoria}`;
       card.className = `student-card ${catClass}`;
-      card.id = `card-${id}`;
-      
-      card.setAttribute('onclick', `toggleStatus(${id})`);
+      card.id = `card-${alumno.id}`;
+      card.setAttribute('onclick', `toggleStatus(${alumno.id})`);
 
       const estrellaHtml = alumno.categoria === 'avanzado' ? '<div class="star-badge">★</div>' : '';
 
@@ -314,11 +440,112 @@
     }
 
     function resetAll() {
-      alumnos.forEach((_, index) => {
-        const id = index + 1;
-        const card = document.getElementById(`card-${id}`);
+      alumnos.forEach((alumno) => {
+        const card = document.getElementById(`card-${alumno.id}`);
         card.classList.remove('used');
       });
+    }
+
+    // Algoritmo para mezclar aleatoriamente (Fisher-Yates)
+    function shuffle(array) {
+      let currentIndex = array.length, randomIndex;
+      while (currentIndex !== 0) {
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+        [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+      }
+      return array;
+    }
+
+    // GENERADOR AUTOMÁTICO DE GRUPOS
+    function generarGrupos() {
+      // Filtrar los que no estén marcados como usados (.used)
+      const disponibles = alumnos.filter(a => !document.getElementById(`card-${a.id}`).classList.contains('used'));
+
+      if (disponibles.length === 0) {
+        alert("¡Todos los estudiantes ya han sido seleccionados o agrupados! Restaura el tablero si deseas volver a agrupar.");
+        return;
+      }
+
+      let ayudas = shuffle(disponibles.filter(a => a.categoria === 'ayuda'));
+      let avanzados = shuffle(disponibles.filter(a => a.categoria === 'avanzado'));
+      let promedios = shuffle(disponibles.filter(a => a.categoria === 'promedio'));
+
+      let grupos = [];
+      let idsSeleccionados = [];
+
+      // 1. Formar parejas obligatorias: 1 Ayuda + 1 Avanzado
+      while (ayudas.length > 0 && avanzados.length > 0) {
+        let ayu = ayudas.pop();
+        let av = avanzados.pop();
+        let grupoActual = [ayu, av];
+        idsSeleccionados.push(ayu.id, av.id);
+
+        // Si hay promedios de sobra y se puede formar un trío con un promedio integrado
+        if (promedios.length > 0) {
+          let prom = promedios.pop();
+          grupoActual.push(prom);
+          idsSeleccionados.push(prom.id);
+        }
+        grupos.push(grupoActual);
+      }
+
+      // Si sobran ayudas o avanzados sin su pareja cruzada original
+      // Los convertimos temporalmente a bolsa general para agrupar con promedios
+      let remanentes = [...ayudas, ...avanzados, ...promedios];
+      shuffle(remanentes);
+
+      // 2. Agrupar los remanentes en parejas o tríos de promedios / sobrantes
+      while (remanentes.length > 0) {
+        if (remanentes.length === 1 && grupos.length > 0) {
+          // Si queda solo 1 suelto, meterlo al último grupo creado para que sea trío/cuarteto
+          let ultimo = remanentes.pop();
+          grupos[grupos.length - 1].push(ultimo);
+          idsSeleccionados.push(ultimo.id);
+        } else if (remanentes.length >= 2) {
+          let cantidadTomar = (remanentes.length === 3) ? 3 : 2;
+          let subGrupo = remanentes.splice(0, cantidadTomar);
+          subGrupo.forEach(s => idsSeleccionados.push(s.id));
+          grupos.push(subGrupo);
+        } else {
+          let solo = remanentes.pop();
+          idsSeleccionados.push(solo.id);
+          grupos.push([solo]);
+        }
+      }
+
+      // Marcar automáticamente en el tablero a los estudiantes agrupados
+      idsSeleccionados.forEach(id => {
+        const card = document.getElementById(`card-${id}`);
+        if (card) card.classList.add('used');
+      });
+
+      // Mostrar resultados en el Modal
+      const modalBody = document.getElementById('modalBodyGrupos');
+      modalBody.innerHTML = '';
+
+      grupos.forEach((g, index) => {
+        let cardDiv = document.createElement('div');
+        cardDiv.className = 'group-card';
+        
+        let htmlMembers = g.map(m => {
+          let roleClass = `role-${m.categoria}`;
+          let roleText = m.categoria === 'ayuda' ? 'Apoyo' : (m.categoria === 'avanzado' ? 'Avanzado ★' : 'Promedio');
+          return `<div class="group-member">
+            <span>${m.nombre}</span>
+            <span class="member-role ${roleClass}">${roleText}</span>
+          </div>`;
+        }).join('');
+
+        cardDiv.innerHTML = `<h3>Grupo ${index + 1}</h3>${htmlMembers}`;
+        modalBody.appendChild(cardDiv);
+      });
+
+      document.getElementById('modalGrupos').classList.add('active');
+    }
+
+    function cerrarModal() {
+      document.getElementById('modalGrupos').classList.remove('active');
     }
   </script>
 </body>
