@@ -80,10 +80,22 @@
       transition: all 0.2s ease;
       overflow: hidden;
       cursor: pointer;
+      position: relative; /* Necesario para ubicar la estrella en la esquina */
     }
 
     .student-card:hover {
       filter: brightness(1.15);
+    }
+
+    /* ESTRELLA BRILLANTE PARA AVANZADOS */
+    .star-badge {
+      position: absolute;
+      top: 4px;
+      right: 6px;
+      color: #facc15;
+      font-size: 14px;
+      text-shadow: 0 0 6px rgba(250, 204, 21, 0.8);
+      pointer-events: none;
     }
 
     /* CATEGORÍA: AVANZADO (FONDO AMARILLO) */
@@ -132,6 +144,9 @@
     .student-card.used .student-name {
       color: #64748b !important;
       text-decoration: line-through;
+    }
+    .student-card.used .star-badge {
+      opacity: 0.2; /* Apaga también un poco la estrella si ya fue usado */
     }
 
     .number-lastname-row {
@@ -219,7 +234,7 @@
 
     /* 
       CATEGORÍAS MANUALES:
-      - "avanzado" (Fondo amarillo)
+      - "avanzado" (Fondo amarillo + estrella brillante)
       - "ayuda" (Fondo verde esmeralda)
       - "promedio" (Fondo normal sin color)
     */
@@ -275,7 +290,11 @@
       
       card.setAttribute('onclick', `toggleStatus(${id})`);
 
+      // Si es avanzado, incluye la estrella en la esquina superior derecha
+      const estrellaHtml = alumno.categoria === 'avanzado' ? '<div class="star-badge">★</div>' : '';
+
       card.innerHTML = `
+        ${estrellaHtml}
         <div class="number-lastname-row">
           <div class="student-number">${numStr}</div>
           <div class="student-lastname" title="${apellido}">${apellido}</div>
