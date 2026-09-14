@@ -66,37 +66,31 @@
       }
     }
 
-    /* AHORA TODA LA TARJETA ES EL BOTÓN */
+    /* TODA LA TARJETA ES EL BOTÓN DE ACTIVACIÓN */
     .student-card {
       background-color: #1e293b;
       border: 1px solid #334155;
       border-radius: 6px;
-      padding: 6px;
+      padding: 8px;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
       transition: all 0.2s ease;
       overflow: hidden;
-      cursor: pointer; /* Muestra la manito al pasar el ratón */
+      cursor: pointer;
     }
 
     .student-card:hover {
       border-color: #38bdf8;
     }
 
-    .card-header {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 2px;
-      width: 100%;
-    }
-
     .number-lastname-row {
       display: flex;
       flex-direction: row;
       align-items: center;
-      gap: 4px;
+      gap: 6px;
       width: 100%;
     }
 
@@ -137,36 +131,13 @@
       text-align: center;
     }
 
-    /* INDICADOR INFERIOR (AHORA MUESTRA EL ICONO DE ESTADO DE FORMA LIMPIA) */
-    .status-indicator {
-      background-color: #0f172a;
-      border: 1px solid #334155;
-      border-radius: 4px;
-      color: #64748b;
-      height: 26px;
-      min-height: 26px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      font-size: 16px;
-      transition: all 0.2s ease;
-      width: 100%;
-      flex-shrink: 0;
-    }
-
-    /* ESTILOS AL MARCAR COMO CUMPLIDO */
+    /* ESTILOS AL MARCAR COMO CUMPLIDO (HOMBRES / MUJERES) */
     .student-card.active-H {
       border-color: #0284c7;
       background-color: #0c4a6e;
     }
     .student-card.active-H .student-number { background-color: #38bdf8; }
     .student-card.active-H .student-lastname { color: #38bdf8; }
-    .student-card.active-H .status-indicator {
-      background-color: #0284c7;
-      color: #ffffff;
-      border-color: #38bdf8;
-    }
 
     .student-card.active-M {
       border-color: #ec4899;
@@ -174,11 +145,6 @@
     }
     .student-card.active-M .student-number { background-color: #f472b6; }
     .student-card.active-M .student-lastname { color: #f472b6; }
-    .student-card.active-M .status-indicator {
-      background-color: #ec4899;
-      color: #ffffff;
-      border-color: #f472b6;
-    }
 
     footer {
       padding: 4px;
@@ -247,15 +213,21 @@
       { nombre: "TRUJILLO, SEBASTIÁN MATEO", genero: "H" }
     ];
 
-    /* SÍMBOLOS ALQUÍMICOS ELEGANTES */
-    const ICONO_HOMBRE = "♂";
-    const ICONO_MUJER = "♀";
-    const ICONO_CHECK = "✔";
-
     const grid = document.getElementById('grid');
 
+    // Función para abreviar el segundo nombre (si tiene más de una palabra)
+    function formatearNombre(nombresStr) {
+      const partes = nombresStr.trim().split(/\s+/);
+      if (partes.length > 1) {
+        // Dejar el primer nombre intacto y la inicial del segundo con un punto
+        return `${partes[0]} ${partes[1].charAt(0)}.`;
+      }
+      return nombresStr;
+    }
+
     alumnos.forEach((alumno, index) => {
-      const [apellido, nombres] = alumno.nombre.split(', ');
+      const [apellido, nombresOriginales] = alumno.nombre.split(', ');
+      const nombresFormateados = formatearNombre(nombresOriginales);
       
       const id = index + 1;
       const numStr = id < 10 ? `0${id}` : id;
@@ -264,48 +236,33 @@
       card.id = `card-${id}`;
       card.dataset.genero = alumno.genero;
       
-      /* AQUÍ ESTÁ EL CAMBIO PRINCIPAL: El evento onclick está en toda la tarjeta */
+      // Toda la tarjeta activa la función al hacer clic
       card.setAttribute('onclick', `toggleStatus(${id})`);
 
-      const iconoInicial = alumno.genero === "H" ? ICONO_HOMBRE : ICONO_MUJER;
-
       card.innerHTML = `
-        <div class="card-header">
-          <div class="number-lastname-row">
-            <div class="student-number">${numStr}</div>
-            <div class="student-lastname" title="${apellido}">${apellido}</div>
-          </div>
-          <div class="student-name" title="${nombres}">${nombres}</div>
+        <div class="number-lastname-row">
+          <div class="student-number">${numStr}</div>
+          <div class="student-lastname" title="${apellido}">${apellido}</div>
         </div>
-        <div class="status-indicator">
-          <span id="text-${id}">${iconoInicial}</span>
-        </div>
+        <div class="student-name" title="${nombresOriginales}">${nombresFormateados}</div>
       `;
       grid.appendChild(card);
     });
 
     function toggleStatus(id) {
       const card = document.getElementById(`card-${id}`);
-      const text = document.getElementById(`text-${id}`);
       const genero = card.dataset.genero;
       const claseActiva = `active-${genero}`;
       
-      const estaActiva = card.classList.toggle(claseActiva);
-      
-      if (estaActiva) {
-        text.innerHTML = ICONO_CHECK;
-      } else {
-        text.innerHTML = genero === "H" ? ICONO_HOMBRE : ICONO_MUJER;
-      }
+      // Alterna el estado de activación en toda la tarjeta
+      card.classList.toggle(claseActiva);
     }
 
     function resetAll() {
       alumnos.forEach((alumno, index) => {
         const id = index + 1;
         const card = document.getElementById(`card-${id}`);
-        const text = document.getElementById(`text-${id}`);
         card.classList.remove('active-H', 'active-M');
-        text.innerHTML = alumno.genero === "H" ? ICONO_HOMBRE : ICONO_MUJER;
       });
     }
   </script>
