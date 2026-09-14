@@ -87,14 +87,21 @@
       filter: brightness(1.15);
     }
 
-    /* ESTRELLA BRILLANTE PARA AVANZADOS */
+    /* ESTRELLA MÁS GRANDE Y NOTORIA CON DELINEADO OSCURO */
     .star-badge {
       position: absolute;
-      top: 4px;
-      right: 6px;
+      top: 3px;
+      right: 5px;
       color: #facc15;
-      font-size: 14px;
-      text-shadow: 0 0 6px rgba(250, 204, 21, 0.8);
+      font-size: 20px; /* Tamaño más grande */
+      font-weight: bold;
+      /* Delineado oscuro usando múltiples sombras de texto */
+      text-shadow: 
+        -1px -1px 0 #713f12,  
+         1px -1px 0 #713f12,
+        -1px  1px 0 #713f12,
+         1px  1px 0 #713f12,
+         0 2px 4px rgba(0, 0, 0, 0.4);
       pointer-events: none;
     }
 
@@ -146,7 +153,7 @@
       text-decoration: line-through;
     }
     .student-card.used .star-badge {
-      opacity: 0.2; /* Apaga también un poco la estrella si ya fue usado */
+      opacity: 0.2; /* Se apaga también al ser usado */
     }
 
     .number-lastname-row {
@@ -234,7 +241,7 @@
 
     /* 
       CATEGORÍAS MANUALES:
-      - "avanzado" (Fondo amarillo + estrella brillante)
+      - "avanzado" (Fondo amarillo + estrella grande delineada)
       - "ayuda" (Fondo verde esmeralda)
       - "promedio" (Fondo normal sin color)
     */
@@ -290,7 +297,6 @@
       
       card.setAttribute('onclick', `toggleStatus(${id})`);
 
-      // Si es avanzado, incluye la estrella en la esquina superior derecha
       const estrellaHtml = alumno.categoria === 'avanzado' ? '<div class="star-badge">★</div>' : '';
 
       card.innerHTML = `
