@@ -80,7 +80,7 @@
       transition: all 0.2s ease;
       overflow: hidden;
       cursor: pointer;
-      position: relative; /* Necesario para ubicar la estrella en la esquina */
+      position: relative;
     }
 
     .student-card:hover {
@@ -93,9 +93,8 @@
       top: 3px;
       right: 5px;
       color: #facc15;
-      font-size: 20px; /* Tamaño más grande */
+      font-size: 20px;
       font-weight: bold;
-      /* Delineado oscuro usando múltiples sombras de texto */
       text-shadow: 
         -1px -1px 0 #713f12,  
          1px -1px 0 #713f12,
@@ -121,20 +120,20 @@
       color: #713f12;
     }
 
-    /* CATEGORÍA: NECESITA AYUDA (FONDO VERDE ESMERALDA) */
+    /* CATEGORÍA: NECESITA AYUDA (FONDO VIOLETA / MORADO - COMPLEMENTARIO) */
     .student-card.cat-ayuda {
-      background-color: #a7f3d0;
-      border-color: #10b981;
+      background-color: #e9d5ff;
+      border-color: #a855f7;
     }
     .student-card.cat-ayuda .student-number {
-      background-color: #047857;
-      color: #ecfdf5;
+      background-color: #7e22ce;
+      color: #f3e8ff;
     }
     .student-card.cat-ayuda .student-lastname {
-      color: #065f46;
+      color: #6b21a8;
     }
     .student-card.cat-ayuda .student-name {
-      color: #022c22;
+      color: #581c87;
     }
 
     /* ESTADO CUANDO YA FUERON SELECCIONADOS / AGRUPADOS (GRIS Y OPACO) */
@@ -153,7 +152,7 @@
       text-decoration: line-through;
     }
     .student-card.used .star-badge {
-      opacity: 0.2; /* Se apaga también al ser usado */
+      opacity: 0.2;
     }
 
     .number-lastname-row {
@@ -241,8 +240,8 @@
 
     /* 
       CATEGORÍAS MANUALES:
-      - "avanzado" (Fondo amarillo + estrella grande delineada)
-      - "ayuda" (Fondo verde esmeralda)
+      - "avanzado" (Fondo amarillo + estrella grande)
+      - "ayuda" (Fondo violeta / morado)
       - "promedio" (Fondo normal sin color)
     */
     const alumnos = [
@@ -274,7 +273,6 @@
 
     const grid = document.getElementById('grid');
 
-    // Función para abreviar el segundo nombre (ej: JUAN MARTIN -> JUAN M.)
     function formatearNombre(nombresStr) {
       const partes = nombresStr.trim().split(/\s+/);
       if (partes.length > 1) {
