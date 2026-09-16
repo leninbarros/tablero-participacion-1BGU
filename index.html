@@ -14,11 +14,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Participación">
 
-  <!-- FIREBASE SDKs -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, doc, setDoc, getDoc, updateid } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-  </script>
+  <!-- LIBRERÍA JSPDF PARA CREAR PDF DESDE LA WEB -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
   <style>
     * {
@@ -96,7 +93,7 @@
       filter: brightness(1.15);
     }
 
-    /* INDICADOR DE NOTAS EN BITÁCORA */
+    /* INDICADOR DE NOTAS */
     .note-indicator {
       position: absolute;
       top: 4px;
@@ -105,7 +102,7 @@
       height: 8px;
       background-color: #38bdf8;
       border-radius: 50%;
-      display: none; /* Se activa si tiene notas */
+      display: none;
     }
     .student-card.has-notes .note-indicator {
       display: block;
@@ -128,37 +125,22 @@
       pointer-events: none;
     }
 
-    /* CATEGORÍA: AVANZADO */
+    /* CATEGORÍAS */
     .student-card.cat-avanzado {
       background-color: #fef08a;
       border-color: #eab308;
     }
-    .student-card.cat-avanzado .student-number {
-      background-color: #ca8a04;
-      color: #fef08a;
-    }
-    .student-card.cat-avanzado .student-lastname {
-      color: #854d0e;
-    }
-    .student-card.cat-avanzado .student-name {
-      color: #713f12;
-    }
+    .student-card.cat-avanzado .student-number { background-color: #ca8a04; color: #fef08a; }
+    .student-card.cat-avanzado .student-lastname { color: #854d0e; }
+    .student-card.cat-avanzado .student-name { color: #713f12; }
 
-    /* CATEGORÍA: AYUDA */
     .student-card.cat-ayuda {
       background-color: #e9d5ff;
       border-color: #a855f7;
     }
-    .student-card.cat-ayuda .student-number {
-      background-color: #7e22ce;
-      color: #f3e8ff;
-    }
-    .student-card.cat-ayuda .student-lastname {
-      color: #6b21a8;
-    }
-    .student-card.cat-ayuda .student-name {
-      color: #581c87;
-    }
+    .student-card.cat-ayuda .student-number { background-color: #7e22ce; color: #f3e8ff; }
+    .student-card.cat-ayuda .student-lastname { color: #6b21a8; }
+    .student-card.cat-ayuda .student-name { color: #581c87; }
 
     /* ESTADO USADO */
     .student-card.used {
@@ -166,18 +148,10 @@
       border-color: #334155 !important;
       opacity: 0.3;
     }
-    .student-card.used .student-number {
-      background-color: #475569 !important;
-      color: #94a3b8 !important;
-    }
+    .student-card.used .student-number { background-color: #475569 !important; color: #94a3b8 !important; }
     .student-card.used .student-lastname,
-    .student-card.used .student-name {
-      color: #64748b !important;
-      text-decoration: line-through;
-    }
-    .student-card.used .star-badge {
-      opacity: 0.2;
-    }
+    .student-card.used .student-name { color: #64748b !important; text-decoration: line-through; }
+    .student-card.used .star-badge { opacity: 0.2; }
 
     .number-lastname-row {
       display: flex;
@@ -250,7 +224,10 @@
     .group-btn { background-color: #0284c7; color: white; }
     .group-btn:hover { background-color: #0369a1; }
 
-    /* MODALES GENÉRICOS */
+    .pdf-btn { background-color: #10b981; color: white; }
+    .pdf-btn:hover { background-color: #059669; }
+
+    /* MODALES */
     .modal-overlay {
       position: fixed;
       top: 0; left: 0;
@@ -315,10 +292,10 @@
       padding-right: 4px;
     }
 
-    /* ESTILOS PARA BITÁCORA */
+    /* BITÁCORA */
     .bitacora-textarea {
       width: 100%;
-      height: 100px;
+      height: 80px;
       background-color: #0f172a;
       color: #f8fafc;
       border: 1px solid #334155;
@@ -328,15 +305,13 @@
       font-family: inherit;
       font-size: 14px;
     }
-    .bitacora-textarea:focus {
-      outline: none;
-      border-color: #38bdf8;
-    }
+    .bitacora-textarea:focus { outline: none; border-color: #38bdf8; }
+
     .historial-lista {
       display: flex;
       flex-direction: column;
       gap: 8px;
-      max-height: 250px;
+      max-height: 220px;
       overflow-y: auto;
       margin-top: 5px;
     }
@@ -346,14 +321,41 @@
       padding: 8px;
       border-radius: 4px;
       font-size: 13px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .nota-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
     .nota-fecha {
       font-size: 11px;
       color: #94a3b8;
-      margin-bottom: 4px;
+    }
+    .nota-acciones {
+      display: flex;
+      gap: 6px;
+    }
+    .btn-acc {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 12px;
+      padding: 0;
+    }
+    .btn-editar { color: #38bdf8; }
+    .btn-eliminar { color: #ef4444; }
+
+    .modal-footer-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 5px;
     }
 
-    /* TARJETAS DE GRUPOS */
+    /* GRUPOS */
     .group-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -420,14 +422,16 @@
         <button class="close-modal" onclick="cerrarModalBitacora()">×</button>
       </div>
       <div class="modal-body">
-        <label style="font-size: 13px; color: #38bdf8; font-weight: bold;">Agregar nueva nota o compromiso:</label>
+        <label id="labelEditorNota" style="font-size: 13px; color: #38bdf8; font-weight: bold;">Agregar nueva nota o compromiso:</label>
         <textarea id="textoNuevaNota" class="bitacora-textarea" placeholder="Escribe aquí acuerdos, adaptaciones o ideas de mejora..."></textarea>
-        <button class="action-btn group-btn" style="align-self: flex-end;" onclick="guardarNotaBitacora()">💾 Guardar Nota</button>
+        
+        <div class="modal-footer-actions">
+          <button class="action-btn group-btn" id="btnGuardarNota" onclick="guardarNotaBitacora()">💾 Guardar Nota</button>
+          <button class="action-btn pdf-btn" onclick="descargarPDFBitacora()">📄 Descargar Reporte PDF</button>
+        </div>
         
         <label style="font-size: 13px; color: #94a3b8; font-weight: bold; margin-top: 10px;">Historial de Bitácora:</label>
-        <div class="historial-lista" id="historialLista">
-          <!-- Historial inyectado -->
-        </div>
+        <div class="historial-lista" id="historialLista"></div>
       </div>
     </div>
   </div>
@@ -478,7 +482,9 @@
 
     const grid = document.getElementById('grid');
     let alumnoActualId = null;
+    let alumnoActualNombre = "";
     let bitacorasGlobal = {};
+    let editandoIndice = null; // Controla si estamos editando una nota existente
 
     function formatearNombre(nombresStr) {
       const partes = nombresStr.trim().split(/\s+/);
@@ -488,7 +494,6 @@
       return nombresStr;
     }
 
-    // Cargar bitácoras desde Firebase al iniciar
     async function cargarBitacorasNube() {
       try {
         const querySnapshot = await getDocs(collection(db, "bitacoras"));
@@ -514,7 +519,7 @@
       });
     }
 
-    // Renderizar tarjetas con soporte de Long-Press (Mantener presionado)
+    // Renderizar tarjetas con soporte de Long-Press
     alumnos.forEach((alumno) => {
       const [apellido, nombresOriginales] = alumno.nombre.split(', ');
       const nombresFormateados = formatearNombre(nombresOriginales);
@@ -537,29 +542,21 @@
         <div class="student-name" title="${nombresOriginales}">${nombresFormateados}</div>
       `;
 
-      // Lógica de clic normal (Marcar usado) vs Mantener presionado (Abrir Bitácora)
       let pressTimer = null;
-
-      const startPress = (e) => {
+      const startPress = () => {
         pressTimer = setTimeout(() => {
           abrirBitacora(alumno.id, alumno.nombre);
-        }, 600); // 600 milisegundos de presión
+        }, 600);
       };
-
-      const cancelPress = () => {
-        clearTimeout(pressTimer);
-      };
+      const cancelPress = () => clearTimeout(pressTimer);
 
       card.addEventListener('mousedown', startPress);
       card.addEventListener('mouseup', cancelPress);
       card.addEventListener('mouseleave', cancelPress);
-
       card.addEventListener('touchstart', startPress);
       card.addEventListener('touchend', cancelPress);
 
-      // Clic normal rápido
-      card.addEventListener('click', (e) => {
-        // Si no fue un long press prolongado, alterna el estado usado
+      card.addEventListener('click', () => {
         toggleStatus(alumno.id);
       });
 
@@ -581,8 +578,12 @@
     // Funciones de Bitácora
     window.abrirBitacora = function(id, nombreCompleto) {
       alumnoActualId = id;
+      alumnoActualNombre = nombreCompleto;
+      editandoIndice = null;
       document.getElementById('tituloBitacora').innerText = `Bitácora: ${nombreCompleto}`;
       document.getElementById('textoNuevaNota').value = '';
+      document.getElementById('labelEditorNota').innerText = "Agregar nueva nota o compromiso:";
+      document.getElementById('btnGuardarNota').innerText = "💾 Guardar Nota";
       renderizarHistorialNotas();
       document.getElementById('modalBitacora').classList.add('active');
     }
@@ -602,12 +603,17 @@
         return;
       }
 
-      // Mostrar de más reciente a más antiguo
-      [...notas].reverse().forEach(n => {
+      notas.forEach((n, idx) => {
         let div = document.createElement('div');
         div.className = 'nota-item';
         div.innerHTML = `
-          <div class="nota-fecha">📅 ${n.fecha}</div>
+          <div class="nota-header-row">
+            <span class="nota-fecha">📅 ${n.fecha}</span>
+            <div class="nota-acciones">
+              <button class="btn-acc btn-editar" onclick="prepararEdicionNota(${idx})">✏️ Editar</button>
+              <button class="btn-acc btn-eliminar" onclick="eliminarNotaBitacora(${idx})">🗑️ Eliminar</button>
+            </div>
+          </div>
           <div>${n.texto}</div>
         `;
         lista.appendChild(div);
@@ -618,19 +624,28 @@
       const texto = document.getElementById('textoNuevaNota').value.trim();
       if (!texto) return alert("Escribe una nota antes de guardar.");
 
-      const ahora = new Date();
-      const fechaFormateada = ahora.toLocaleDateString() + ' ' + ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
       if (!bitacorasGlobal[alumnoActualId]) {
         bitacorasGlobal[alumnoActualId] = [];
       }
 
-      bitacorasGlobal[alumnoActualId].push({
-        texto: texto,
-        fecha: fechaFormateada
-      });
+      const ahora = new Date();
+      const fechaFormateada = ahora.toLocaleDateString() + ' ' + ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-      // Guardar en Firestore Cloud
+      if (editandoIndice !== null) {
+        // Actualizar nota existente manteniendo su fecha original o actualizando la modificación
+        bitacorasGlobal[alumnoActualId][editandoIndice].texto = texto;
+        bitacorasGlobal[alumnoActualId][editandoIndice].fecha = fechaFormateada + " (Modificada)";
+        editandoIndice = null;
+        document.getElementById('labelEditorNota').innerText = "Agregar nueva nota o compromiso:";
+        document.getElementById('btnGuardarNota').innerText = "💾 Guardar Nota";
+      } else {
+        // Crear nueva nota
+        bitacorasGlobal[alumnoActualId].push({
+          texto: texto,
+          fecha: fechaFormateada
+        });
+      }
+
       try {
         await setDoc(doc(db, "bitacoras", String(alumnoActualId)), {
           notas: bitacorasGlobal[alumnoActualId]
@@ -642,6 +657,90 @@
         console.error("Error al guardar en Firebase: ", e);
         alert("Hubo un error al guardar en la nube. Revisa tu conexión.");
       }
+    }
+
+    window.prepararEdicionNota = function(idx) {
+      editandoIndice = idx;
+      const nota = bitacorasGlobal[alumnoActualId][idx];
+      document.getElementById('textoNuevaNota').value = nota.texto;
+      document.getElementById('labelEditorNota').innerText = `Editando nota #${idx + 1}:`;
+      document.getElementById('btnGuardarNota').innerText = "💾 Actualizar Nota";
+      document.getElementById('textoNuevaNota').focus();
+    }
+
+    window.eliminarNotaBitacora = async function(idx) {
+      if (!confirm("¿Estás seguro de eliminar esta nota de la bitácora?")) return;
+
+      bitacorasGlobal[alumnoActualId].splice(idx, 1);
+      
+      try {
+        await setDoc(doc(db, "bitacoras", String(alumnoActualId)), {
+          notas: bitacorasGlobal[alumnoActualId]
+        });
+        renderizarHistorialNotas();
+        actualizarIndicadoresNotas();
+      } catch (e) {
+        console.error("Error al eliminar nota: ", e);
+      }
+    }
+
+    // GENERADOR DE PDF OFICIAL
+    window.descargarPDFBitacora = function() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      const notas = bitacorasGlobal[alumnoActualId] || [];
+
+      // Estética del PDF institucional
+      doc.setFillColor(30, 41, 59); // Encabezado azul oscuro
+      doc.rect(0, 0, 210, 30, "F");
+
+      doc.setTextColor(255, 255, 255);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(16);
+      doc.text("REPORTE DE SEGUIMIENTO Y BITÁCORA", 14, 18);
+
+      doc.setTextColor(15, 23, 42);
+      doc.setFontSize(12);
+      doc.text(`Estudiante: ${alumnoActualNombre}`, 14, 45);
+      doc.text(`Fecha de emisión: ${new Date().toLocaleDateString()}`, 14, 53);
+
+      doc.setDrawColor(56, 189, 248);
+      doc.line(14, 58, 196, 58);
+
+      let yPos = 70;
+      doc.setFontSize(11);
+
+      if (notas.length === 0) {
+        doc.setTextColor(100, 100, 100);
+        doc.text("No registra anotaciones ni compromisos previos en su bitácora.", 14, yPos);
+      } else {
+        notas.forEach((n, index) => {
+          if (yPos > 270) {
+            doc.addPage();
+            yPos = 20;
+          }
+          doc.setFont("helvetica", "bold");
+          doc.setTextColor(2, 132, 199);
+          doc.text(`Registro #${index + 1} - ${n.fecha}`, 14, yPos);
+          
+          doc.setFont("helvetica", "normal");
+          doc.setTextColor(15, 23, 42);
+          
+          // Dividir texto largo para que encaje bien en la página PDF
+          const textoLineas = doc.splitTextToSize(n.texto, 180);
+          doc.text(textoLineas, 14, yPos + 6);
+          
+          yPos += (textoLineas.length * 6) + 14;
+        });
+      }
+
+      // Pie de página
+      doc.setFontSize(9);
+      doc.setTextColor(150, 150, 150);
+      doc.text("Sistema de Acompañamiento Académico - 1 BGU", 14, 285);
+
+      // Guardar archivo PDF con el nombre del alumno
+      doc.save(`Bitacora_${alumnoActualNombre.replace(/[^a-zA-Z]/g, "_")}.pdf`);
     }
 
     // Algoritmo de Grupos Automáticos
@@ -736,7 +835,6 @@
       document.getElementById('modalGrupos').classList.remove('active');
     }
 
-    // Inicializar carga de datos de la nube al arrancar
     cargarBitacorasNube();
   </script>
 </body>
