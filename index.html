@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Tablero de Participación y Grupos</title>
+  <title>Tablero 1 BGU - Participación y Bitácora</title>
   
   <!-- ANDROID CHROME CONFIGURACIÓN PWA -->
   <meta name="mobile-web-app-capable" content="yes">
@@ -12,7 +12,7 @@
   <!-- IPHONE SAFARI CONFIGURACIÓN PWA -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Participación">
+  <meta name="apple-mobile-web-app-title" content="Tablero 1 BGU">
 
   <!-- LIBRERÍA JSPDF PARA CREAR PDF DESDE LA WEB -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -356,6 +356,12 @@
     }
 
     /* GRUPOS */
+    .modal-actions-top {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 8px;
+    }
+
     .group-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -366,6 +372,7 @@
       border: 1px solid #334155;
       border-radius: 6px;
       padding: 10px;
+      position: relative;
     }
     .group-card h3 {
       margin: 0 0 6px 0;
@@ -373,6 +380,21 @@
       color: #facc15;
       border-bottom: 1px solid #1e293b;
       padding-bottom: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .btn-copy-group {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 12px;
+      color: #38bdf8;
+      padding: 2px 6px;
+      border-radius: 3px;
+    }
+    .btn-copy-group:hover {
+      background-color: #1e293b;
     }
     .group-member {
       font-size: 13px;
@@ -410,6 +432,9 @@
         <h2>Equipos de Trabajo Optimizados</h2>
         <button class="close-modal" onclick="cerrarModalGrupos()">×</button>
       </div>
+      <div class="modal-actions-top">
+        <button class="action-btn group-btn" style="font-size: 12px; padding: 4px 10px;" onclick="copiarTodosLosGrupos()">📋 Copiar Todos los Grupos</button>
+      </div>
       <div class="modal-body group-grid" id="modalBodyGrupos"></div>
     </div>
   </div>
@@ -439,7 +464,7 @@
   <!-- SCRIPT CON FIREBASE Y LÓGICA -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDcmoMtCw0Vjp1aZbHqkOfqejfg19ghzgg",
@@ -484,7 +509,8 @@
     let alumnoActualId = null;
     let alumnoActualNombre = "";
     let bitacorasGlobal = {};
-    let editandoIndice = null; // Controla si estamos editando una nota existente
+    let editandoIndice = null;
+    let gruposUltimos = [];
 
     function formatearNombre(nombresStr) {
       const partes = nombresStr.trim().split(/\s+/);
@@ -519,7 +545,6 @@
       });
     }
 
-    // Renderizar tarjetas con soporte de Long-Press
     alumnos.forEach((alumno) => {
       const [apellido, nombresOriginales] = alumno.nombre.split(', ');
       const nombresFormateados = formatearNombre(nombresOriginales);
@@ -575,7 +600,6 @@
       });
     }
 
-    // Funciones de Bitácora
     window.abrirBitacora = function(id, nombreCompleto) {
       alumnoActualId = id;
       alumnoActualNombre = nombreCompleto;
@@ -632,14 +656,12 @@
       const fechaFormateada = ahora.toLocaleDateString() + ' ' + ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
       if (editandoIndice !== null) {
-        // Actualizar nota existente manteniendo su fecha original o actualizando la modificación
         bitacorasGlobal[alumnoActualId][editandoIndice].texto = texto;
         bitacorasGlobal[alumnoActualId][editandoIndice].fecha = fechaFormateada + " (Modificada)";
         editandoIndice = null;
         document.getElementById('labelEditorNota').innerText = "Agregar nueva nota o compromiso:";
         document.getElementById('btnGuardarNota').innerText = "💾 Guardar Nota";
       } else {
-        // Crear nueva nota
         bitacorasGlobal[alumnoActualId].push({
           texto: texto,
           fecha: fechaFormateada
@@ -684,14 +706,12 @@
       }
     }
 
-    // GENERADOR DE PDF OFICIAL
     window.descargarPDFBitacora = function() {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
       const notas = bitacorasGlobal[alumnoActualId] || [];
 
-      // Estética del PDF institucional
-      doc.setFillColor(30, 41, 59); // Encabezado azul oscuro
+      doc.setFillColor(30, 41, 59);
       doc.rect(0, 0, 210, 30, "F");
 
       doc.setTextColor(255, 255, 255);
@@ -726,7 +746,6 @@
           doc.setFont("helvetica", "normal");
           doc.setTextColor(15, 23, 42);
           
-          // Dividir texto largo para que encaje bien en la página PDF
           const textoLineas = doc.splitTextToSize(n.texto, 180);
           doc.text(textoLineas, 14, yPos + 6);
           
@@ -734,16 +753,13 @@
         });
       }
 
-      // Pie de página
       doc.setFontSize(9);
       doc.setTextColor(150, 150, 150);
       doc.text("Sistema de Acompañamiento Académico - 1 BGU", 14, 285);
 
-      // Guardar archivo PDF con el nombre del alumno
       doc.save(`Bitacora_${alumnoActualNombre.replace(/[^a-zA-Z]/g, "_")}.pdf`);
     }
 
-    // Algoritmo de Grupos Automáticos
     function shuffle(array) {
       let currentIndex = array.length, randomIndex;
       while (currentIndex !== 0) {
@@ -803,6 +819,8 @@
         }
       }
 
+      gruposUltimos = grupos;
+
       idsSeleccionados.forEach(id => {
         const card = document.getElementById(`card-${id}`);
         if (card) card.classList.add('used');
@@ -824,11 +842,39 @@
           </div>`;
         }).join('');
 
-        cardDiv.innerHTML = `<h3>Grupo ${index + 1}</h3>${htmlMembers}`;
+        cardDiv.innerHTML = `
+          <h3>
+            <span>Grupo ${index + 1}</span>
+            <button class="btn-copy-group" onclick="copiarGrupo(${index})">📋 Copiar</button>
+          </h3>
+          ${htmlMembers}
+        `;
         modalBody.appendChild(cardDiv);
       });
 
       document.getElementById('modalGrupos').classList.add('active');
+    }
+
+    window.copiarGrupo = function(index) {
+      const g = gruposUltimos[index];
+      let texto = `*Grupo ${index + 1}*\n` + g.map(m => `- ${m.nombre}`).join('\n');
+      navigator.clipboard.writeText(texto).then(() => {
+        alert(`¡Grupo ${index + 1} copiado al portapapeles!`);
+      }).catch(err => {
+        console.error("Error al copiar: ", err);
+      });
+    }
+
+    window.copiarTodosLosGrupos = function() {
+      let textoTotal = "EQUIPOS DE TRABAJO - 1 BGU\n\n";
+      gruposUltimos.forEach((g, index) => {
+        textoTotal += `*Grupo ${index + 1}*\n` + g.map(m => `- ${m.nombre}`).join('\n') + "\n\n";
+      });
+      navigator.clipboard.writeText(textoTotal.trim()).then(() => {
+        alert("¡Todos los grupos fueron copiados al portapapeles!");
+      }).catch(err => {
+        console.error("Error al copiar todos: ", err);
+      });
     }
 
     window.cerrarModalGrupos = function() {
