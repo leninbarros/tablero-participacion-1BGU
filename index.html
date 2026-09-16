@@ -14,6 +14,12 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Participación">
 
+  <!-- FIREBASE SDKs -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, doc, setDoc, getDoc, updateid } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  </script>
+
   <style>
     * {
       box-sizing: border-box;
@@ -69,7 +75,7 @@
       }
     }
 
-    /* ESTILO BASE DE LA TARJETA (PROMEDIO / SIN COLOR) */
+    /* ESTILO BASE DE LA TARJETA */
     .student-card {
       background-color: #1e293b;
       border: 1px solid #334155;
@@ -90,7 +96,22 @@
       filter: brightness(1.15);
     }
 
-    /* ESTRELLA MÁS GRANDE Y NOTORIA CON DELINEADO OSCURO */
+    /* INDICADOR DE NOTAS EN BITÁCORA */
+    .note-indicator {
+      position: absolute;
+      top: 4px;
+      left: 6px;
+      width: 8px;
+      height: 8px;
+      background-color: #38bdf8;
+      border-radius: 50%;
+      display: none; /* Se activa si tiene notas */
+    }
+    .student-card.has-notes .note-indicator {
+      display: block;
+    }
+
+    /* ESTRELLA PARA AVANZADOS */
     .star-badge {
       position: absolute;
       top: 3px;
@@ -107,7 +128,7 @@
       pointer-events: none;
     }
 
-    /* CATEGORÍA: AVANZADO (FONDO AMARILLO) */
+    /* CATEGORÍA: AVANZADO */
     .student-card.cat-avanzado {
       background-color: #fef08a;
       border-color: #eab308;
@@ -123,7 +144,7 @@
       color: #713f12;
     }
 
-    /* CATEGORÍA: NECESITA AYUDA (FONDO VIOLETA / MORADO) */
+    /* CATEGORÍA: AYUDA */
     .student-card.cat-ayuda {
       background-color: #e9d5ff;
       border-color: #a855f7;
@@ -139,7 +160,7 @@
       color: #581c87;
     }
 
-    /* ESTADO CUANDO YA FUERON SELECCIONADOS / AGRUPADOS (GRIS Y OPACO) */
+    /* ESTADO USADO */
     .student-card.used {
       background-color: #1e293b !important;
       border-color: #334155 !important;
@@ -223,29 +244,17 @@
       gap: 5px;
     }
 
-    .reset-btn {
-      background-color: #ef4444;
-      color: white;
-    }
-    .reset-btn:hover {
-      background-color: #dc2626;
-    }
+    .reset-btn { background-color: #ef4444; color: white; }
+    .reset-btn:hover { background-color: #dc2626; }
 
-    .group-btn {
-      background-color: #0284c7;
-      color: white;
-    }
-    .group-btn:hover {
-      background-color: #0369a1;
-    }
+    .group-btn { background-color: #0284c7; color: white; }
+    .group-btn:hover { background-color: #0369a1; }
 
-    /* MODAL DE GRUPOS */
+    /* MODALES GENÉRICOS */
     .modal-overlay {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100dvh;
+      top: 0; left: 0;
+      width: 100vw; height: 100dvh;
       background: rgba(15, 23, 42, 0.85);
       display: flex;
       justify-content: center;
@@ -255,7 +264,6 @@
       pointer-events: none;
       transition: opacity 0.2s ease;
     }
-
     .modal-overlay.active {
       opacity: 1;
       pointer-events: auto;
@@ -267,7 +275,7 @@
       border-radius: 8px;
       width: 90%;
       max-width: 600px;
-      max-height: 80vh;
+      max-height: 85vh;
       display: flex;
       flex-direction: column;
       padding: 16px;
@@ -296,26 +304,67 @@
       font-size: 20px;
       cursor: pointer;
     }
-    .close-modal:hover {
-      color: #fff;
-    }
+    .close-modal:hover { color: #fff; }
 
     .modal-body {
       overflow-y: auto;
       flex-grow: 1;
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      display: flex;
+      flex-direction: column;
       gap: 10px;
       padding-right: 4px;
     }
 
+    /* ESTILOS PARA BITÁCORA */
+    .bitacora-textarea {
+      width: 100%;
+      height: 100px;
+      background-color: #0f172a;
+      color: #f8fafc;
+      border: 1px solid #334155;
+      border-radius: 4px;
+      padding: 8px;
+      resize: vertical;
+      font-family: inherit;
+      font-size: 14px;
+    }
+    .bitacora-textarea:focus {
+      outline: none;
+      border-color: #38bdf8;
+    }
+    .historial-lista {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 250px;
+      overflow-y: auto;
+      margin-top: 5px;
+    }
+    .nota-item {
+      background-color: #0f172a;
+      border-left: 3px solid #38bdf8;
+      padding: 8px;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+    .nota-fecha {
+      font-size: 11px;
+      color: #94a3b8;
+      margin-bottom: 4px;
+    }
+
+    /* TARJETAS DE GRUPOS */
+    .group-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 10px;
+    }
     .group-card {
       background-color: #0f172a;
       border: 1px solid #334155;
       border-radius: 6px;
       padding: 10px;
     }
-
     .group-card h3 {
       margin: 0 0 6px 0;
       font-size: 14px;
@@ -323,7 +372,6 @@
       border-bottom: 1px solid #1e293b;
       padding-bottom: 4px;
     }
-
     .group-member {
       font-size: 13px;
       padding: 3px 0;
@@ -353,23 +401,53 @@
     <button class="action-btn reset-btn" onclick="resetAll()">Restaurar Todo el Tablero</button>
   </footer>
 
-  <!-- MODAL PARA MOSTRAR LOS GRUPOS -->
+  <!-- MODAL DE GRUPOS -->
   <div class="modal-overlay" id="modalGrupos">
     <div class="modal-content">
       <div class="modal-header">
         <h2>Equipos de Trabajo Optimizados</h2>
-        <button class="close-modal" onclick="cerrarModal()">×</button>
+        <button class="close-modal" onclick="cerrarModalGrupos()">×</button>
       </div>
-      <div class="modal-body" id="modalBodyGrupos">
-        <!-- Los grupos se inyectarán aquí -->
+      <div class="modal-body group-grid" id="modalBodyGrupos"></div>
+    </div>
+  </div>
+
+  <!-- MODAL DE BITÁCORA / EXPEDIENTE -->
+  <div class="modal-overlay" id="modalBitacora">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="tituloBitacora">Bitácora del Estudiante</h2>
+        <button class="close-modal" onclick="cerrarModalBitacora()">×</button>
+      </div>
+      <div class="modal-body">
+        <label style="font-size: 13px; color: #38bdf8; font-weight: bold;">Agregar nueva nota o compromiso:</label>
+        <textarea id="textoNuevaNota" class="bitacora-textarea" placeholder="Escribe aquí acuerdos, adaptaciones o ideas de mejora..."></textarea>
+        <button class="action-btn group-btn" style="align-self: flex-end;" onclick="guardarNotaBitacora()">💾 Guardar Nota</button>
+        
+        <label style="font-size: 13px; color: #94a3b8; font-weight: bold; margin-top: 10px;">Historial de Bitácora:</label>
+        <div class="historial-lista" id="historialLista">
+          <!-- Historial inyectado -->
+        </div>
       </div>
     </div>
   </div>
 
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js').catch(() => {});
-    }
+  <!-- SCRIPT CON FIREBASE Y LÓGICA -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDcmoMtCw0Vjp1aZbHqkOfqejfg19ghzgg",
+      authDomain: "participacion1bgu.firebaseapp.com",
+      projectId: "participacion1bgu",
+      storageBucket: "participacion1bgu.firebasestorage.app",
+      messagingSenderId: "663983703486",
+      appId: "1:663983703486:web:7969ef175c15717ac2a5ef"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
     const alumnos = [
       { id: 1, nombre: "ALBUJA, JUAN MARTIN", categoria: "ayuda" },
@@ -399,6 +477,8 @@
     ];
 
     const grid = document.getElementById('grid');
+    let alumnoActualId = null;
+    let bitacorasGlobal = {};
 
     function formatearNombre(nombresStr) {
       const partes = nombresStr.trim().split(/\s+/);
@@ -408,22 +488,47 @@
       return nombresStr;
     }
 
-    // Renderizar tarjetas iniciales
+    // Cargar bitácoras desde Firebase al iniciar
+    async function cargarBitacorasNube() {
+      try {
+        const querySnapshot = await getDocs(collection(db, "bitacoras"));
+        querySnapshot.forEach((docSnap) => {
+          bitacorasGlobal[docSnap.id] = docSnap.data().notas || [];
+        });
+        actualizarIndicadoresNotas();
+      } catch (e) {
+        console.error("Error cargando bitácoras: ", e);
+      }
+    }
+
+    function actualizarIndicadoresNotas() {
+      alumnos.forEach(alumno => {
+        const card = document.getElementById(`card-${alumno.id}`);
+        if (card) {
+          if (bitacorasGlobal[alumno.id] && bitacorasGlobal[alumno.id].length > 0) {
+            card.classList.add('has-notes');
+          } else {
+            card.classList.remove('has-notes');
+          }
+        }
+      });
+    }
+
+    // Renderizar tarjetas con soporte de Long-Press (Mantener presionado)
     alumnos.forEach((alumno) => {
       const [apellido, nombresOriginales] = alumno.nombre.split(', ');
       const nombresFormateados = formatearNombre(nombresOriginales);
-      
       const numStr = alumno.id < 10 ? `0${alumno.id}` : alumno.id;
-      const card = document.createElement('div');
       
+      const card = document.createElement('div');
       const catClass = `cat-${alumno.categoria}`;
       card.className = `student-card ${catClass}`;
       card.id = `card-${alumno.id}`;
-      card.setAttribute('onclick', `toggleStatus(${alumno.id})`);
 
       const estrellaHtml = alumno.categoria === 'avanzado' ? '<div class="star-badge">★</div>' : '';
 
       card.innerHTML = `
+        <div class="note-indicator"></div>
         ${estrellaHtml}
         <div class="number-lastname-row">
           <div class="student-number">${numStr}</div>
@@ -431,22 +536,115 @@
         </div>
         <div class="student-name" title="${nombresOriginales}">${nombresFormateados}</div>
       `;
+
+      // Lógica de clic normal (Marcar usado) vs Mantener presionado (Abrir Bitácora)
+      let pressTimer = null;
+
+      const startPress = (e) => {
+        pressTimer = setTimeout(() => {
+          abrirBitacora(alumno.id, alumno.nombre);
+        }, 600); // 600 milisegundos de presión
+      };
+
+      const cancelPress = () => {
+        clearTimeout(pressTimer);
+      };
+
+      card.addEventListener('mousedown', startPress);
+      card.addEventListener('mouseup', cancelPress);
+      card.addEventListener('mouseleave', cancelPress);
+
+      card.addEventListener('touchstart', startPress);
+      card.addEventListener('touchend', cancelPress);
+
+      // Clic normal rápido
+      card.addEventListener('click', (e) => {
+        // Si no fue un long press prolongado, alterna el estado usado
+        toggleStatus(alumno.id);
+      });
+
       grid.appendChild(card);
     });
 
-    function toggleStatus(id) {
+    window.toggleStatus = function(id) {
       const card = document.getElementById(`card-${id}`);
       card.classList.toggle('used');
     }
 
-    function resetAll() {
+    window.resetAll = function() {
       alumnos.forEach((alumno) => {
         const card = document.getElementById(`card-${alumno.id}`);
         card.classList.remove('used');
       });
     }
 
-    // Algoritmo para mezclar aleatoriamente (Fisher-Yates)
+    // Funciones de Bitácora
+    window.abrirBitacora = function(id, nombreCompleto) {
+      alumnoActualId = id;
+      document.getElementById('tituloBitacora').innerText = `Bitácora: ${nombreCompleto}`;
+      document.getElementById('textoNuevaNota').value = '';
+      renderizarHistorialNotas();
+      document.getElementById('modalBitacora').classList.add('active');
+    }
+
+    window.cerrarModalBitacora = function() {
+      document.getElementById('modalBitacora').classList.remove('active');
+      actualizarIndicadoresNotas();
+    }
+
+    function renderizarHistorialNotas() {
+      const lista = document.getElementById('historialLista');
+      lista.innerHTML = '';
+      const notas = bitacorasGlobal[alumnoActualId] || [];
+
+      if (notas.length === 0) {
+        lista.innerHTML = '<div style="color: #64748b; font-size: 13px; text-align: center; padding: 10px;">No hay notas registradas todavía.</div>';
+        return;
+      }
+
+      // Mostrar de más reciente a más antiguo
+      [...notas].reverse().forEach(n => {
+        let div = document.createElement('div');
+        div.className = 'nota-item';
+        div.innerHTML = `
+          <div class="nota-fecha">📅 ${n.fecha}</div>
+          <div>${n.texto}</div>
+        `;
+        lista.appendChild(div);
+      });
+    }
+
+    window.guardarNotaBitacora = async function() {
+      const texto = document.getElementById('textoNuevaNota').value.trim();
+      if (!texto) return alert("Escribe una nota antes de guardar.");
+
+      const ahora = new Date();
+      const fechaFormateada = ahora.toLocaleDateString() + ' ' + ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      if (!bitacorasGlobal[alumnoActualId]) {
+        bitacorasGlobal[alumnoActualId] = [];
+      }
+
+      bitacorasGlobal[alumnoActualId].push({
+        texto: texto,
+        fecha: fechaFormateada
+      });
+
+      // Guardar en Firestore Cloud
+      try {
+        await setDoc(doc(db, "bitacoras", String(alumnoActualId)), {
+          notas: bitacorasGlobal[alumnoActualId]
+        });
+        document.getElementById('textoNuevaNota').value = '';
+        renderizarHistorialNotas();
+        actualizarIndicadoresNotas();
+      } catch (e) {
+        console.error("Error al guardar en Firebase: ", e);
+        alert("Hubo un error al guardar en la nube. Revisa tu conexión.");
+      }
+    }
+
+    // Algoritmo de Grupos Automáticos
     function shuffle(array) {
       let currentIndex = array.length, randomIndex;
       while (currentIndex !== 0) {
@@ -457,9 +655,7 @@
       return array;
     }
 
-    // GENERADOR AUTOMÁTICO DE GRUPOS
-    function generarGrupos() {
-      // Filtrar los que no estén marcados como usados (.used)
+    window.generarGrupos = function() {
       const disponibles = alumnos.filter(a => !document.getElementById(`card-${a.id}`).classList.contains('used'));
 
       if (disponibles.length === 0) {
@@ -474,14 +670,12 @@
       let grupos = [];
       let idsSeleccionados = [];
 
-      // 1. Formar parejas obligatorias: 1 Ayuda + 1 Avanzado
       while (ayudas.length > 0 && avanzados.length > 0) {
         let ayu = ayudas.pop();
         let av = avanzados.pop();
         let grupoActual = [ayu, av];
         idsSeleccionados.push(ayu.id, av.id);
 
-        // Si hay promedios de sobra y se puede formar un trío con un promedio integrado
         if (promedios.length > 0) {
           let prom = promedios.pop();
           grupoActual.push(prom);
@@ -490,15 +684,11 @@
         grupos.push(grupoActual);
       }
 
-      // Si sobran ayudas o avanzados sin su pareja cruzada original
-      // Los convertimos temporalmente a bolsa general para agrupar con promedios
       let remanentes = [...ayudas, ...avanzados, ...promedios];
       shuffle(remanentes);
 
-      // 2. Agrupar los remanentes en parejas o tríos de promedios / sobrantes
       while (remanentes.length > 0) {
         if (remanentes.length === 1 && grupos.length > 0) {
-          // Si queda solo 1 suelto, meterlo al último grupo creado para que sea trío/cuarteto
           let ultimo = remanentes.pop();
           grupos[grupos.length - 1].push(ultimo);
           idsSeleccionados.push(ultimo.id);
@@ -514,13 +704,11 @@
         }
       }
 
-      // Marcar automáticamente en el tablero a los estudiantes agrupados
       idsSeleccionados.forEach(id => {
         const card = document.getElementById(`card-${id}`);
         if (card) card.classList.add('used');
       });
 
-      // Mostrar resultados en el Modal
       const modalBody = document.getElementById('modalBodyGrupos');
       modalBody.innerHTML = '';
 
@@ -544,9 +732,12 @@
       document.getElementById('modalGrupos').classList.add('active');
     }
 
-    function cerrarModal() {
+    window.cerrarModalGrupos = function() {
       document.getElementById('modalGrupos').classList.remove('active');
     }
+
+    // Inicializar carga de datos de la nube al arrancar
+    cargarBitacorasNube();
   </script>
 </body>
 </html>
