@@ -251,7 +251,7 @@
       border: 2px solid #38bdf8;
       border-radius: 8px;
       width: 90%;
-      max-width: 600px;
+      max-width: 700px;
       max-height: 85vh;
       display: flex;
       flex-direction: column;
@@ -355,11 +355,28 @@
       margin-top: 5px;
     }
 
-    /* GRUPOS */
+    /* GRUPOS Y PANTALLA ÉPICA */
     .modal-actions-top {
       display: flex;
       justify-content: flex-end;
+      gap: 8px;
       margin-bottom: 8px;
+    }
+
+    .epic-banner {
+      text-align: center;
+      background: linear-gradient(135deg, #1e1b4b, #311042);
+      border: 2px solid #a855f7;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 12px;
+    }
+    .countdown-timer {
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: #facc15;
+      text-shadow: 0 0 10px rgba(250, 204, 21, 0.5);
+      margin: 3px 0;
     }
 
     .group-grid {
@@ -373,16 +390,33 @@
       border-radius: 6px;
       padding: 10px;
       position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
     }
-    .group-card h3 {
-      margin: 0 0 6px 0;
-      font-size: 14px;
-      color: #facc15;
-      border-bottom: 1px solid #1e293b;
-      padding-bottom: 4px;
+    .group-card-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      border-bottom: 1px solid #1e293b;
+      padding-bottom: 5px;
+      margin-bottom: 6px;
+    }
+    .group-card h3 {
+      margin: 0;
+      font-size: 14px;
+      color: #facc15;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .group-score-badge {
+      background-color: #0284c7;
+      color: white;
+      font-weight: bold;
+      font-size: 12px;
+      padding: 2px 7px;
+      border-radius: 10px;
     }
     .btn-copy-group {
       background: none;
@@ -396,9 +430,15 @@
     .btn-copy-group:hover {
       background-color: #1e293b;
     }
+    .group-members-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 8px;
+    }
     .group-member {
       font-size: 13px;
-      padding: 3px 0;
+      padding: 2px 0;
       display: flex;
       justify-content: space-between;
     }
@@ -410,6 +450,28 @@
     .role-ayuda { background-color: #7e22ce; color: #f3e8ff; }
     .role-avanzado { background-color: #ca8a04; color: #fef08a; }
     .role-promedio { background-color: #475569; color: #f8fafc; }
+
+    .score-controls {
+      display: flex;
+      gap: 6px;
+      justify-content: flex-end;
+    }
+    .score-btn {
+      background-color: #334155;
+      color: white;
+      border: none;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .score-btn.plus { background-color: #16a34a; }
+    .score-btn.plus:hover { background-color: #15803d; }
+    .score-btn.minus { background-color: #dc2626; }
+    .score-btn.minus:hover { background-color: #b91c1c; }
+
+    #audioContainer { display: none; }
   </style>
 </head>
 <body>
@@ -421,22 +483,34 @@
   <div class="grid-container" id="grid"></div>
 
   <footer>
-    <button class="action-btn group-btn" onclick="generarGrupos()">✨ Crear Grupos Automáticos</button>
+    <button class="action-btn group-btn" onclick="generarGrupos()">⚔️ Crear Grupos Épicos</button>
     <button class="action-btn reset-btn" onclick="resetAll()">Restaurar Todo el Tablero</button>
   </footer>
 
-  <!-- MODAL DE GRUPOS -->
+  <!-- MODAL DE GRUPOS ÉPICOS -->
   <div class="modal-overlay" id="modalGrupos">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>Equipos de Trabajo Optimizados</h2>
+        <h2>⚔️ Equipos de Trabajo - ¡Mazinger Z Activo!</h2>
         <button class="close-modal" onclick="cerrarModalGrupos()">×</button>
       </div>
       <div class="modal-actions-top">
-        <button class="action-btn group-btn" style="font-size: 12px; padding: 4px 10px;" onclick="copiarTodosLosGrupos()">📋 Copiar Todos los Grupos</button>
+        <button class="action-btn group-btn" style="font-size: 12px; padding: 4px 10px;" onclick="copiarTodosLosGrupos()">📋 Copiar Todos</button>
       </div>
-      <div class="modal-body group-grid" id="modalBodyGrupos"></div>
+      <div class="modal-body">
+        <div class="epic-banner">
+          <div style="font-size: 12px; font-weight: bold; color: #c084fc; text-transform: uppercase;">¡Muevan mesas y sillas! Tiempo restante:</div>
+          <div class="countdown-timer" id="timerDisplay">02:00</div>
+          <div style="font-size: 11px; color: #cbd5e1;">Al finalizar el tiempo se habilitarán las calificaciones grupales automáticas.</div>
+        </div>
+        <div class="group-grid" id="modalBodyGrupos"></div>
+      </div>
     </div>
+  </div>
+
+  <!-- REPRODUCTOR OCULTO DE YOUTUBE (Mazinger Z Instrumental - FQpXZG_u4hw) -->
+  <div id="audioContainer">
+    <iframe id="youtubeAudio" width="200" height="200" src="" frameborder="0" allow="autoplay"></iframe>
   </div>
 
   <!-- MODAL DE BITÁCORA / EXPEDIENTE -->
@@ -511,6 +585,8 @@
     let bitacorasGlobal = {};
     let editandoIndice = null;
     let gruposUltimos = [];
+    let puntajesGrupos = {};
+    let timerInterval = null;
 
     function formatearNombre(nombresStr) {
       const partes = nombresStr.trim().split(/\s+/);
@@ -598,6 +674,7 @@
         const card = document.getElementById(`card-${alumno.id}`);
         card.classList.remove('used');
       });
+      puntajesGrupos = {};
     }
 
     window.abrirBitacora = function(id, nombreCompleto) {
@@ -821,6 +898,11 @@
 
       gruposUltimos = grupos;
 
+      // Inicializar puntajes grupales en 10.0
+      grupos.forEach((_, idx) => {
+        if (puntajesGrupos[idx] === undefined) puntajesGrupos[idx] = 10.0;
+      });
+
       idsSeleccionados.forEach(id => {
         const card = document.getElementById(`card-${id}`);
         if (card) card.classList.add('used');
@@ -843,21 +925,71 @@
         }).join('');
 
         cardDiv.innerHTML = `
-          <h3>
-            <span>Grupo ${index + 1}</span>
-            <button class="btn-copy-group" onclick="copiarGrupo(${index})">📋 Copiar</button>
-          </h3>
-          ${htmlMembers}
+          <div class="group-card-header">
+            <h3>
+              <span>Grupo ${index + 1}</span>
+              <button class="btn-copy-group" onclick="copiarGrupo(${index})">📋 Copiar</button>
+            </h3>
+            <div class="group-score-badge" id="score-badge-${index}">Nota: ${puntajesGrupos[index].toFixed(1)}</div>
+          </div>
+          <div class="group-members-list">${htmlMembers}</div>
+          <div class="score-controls" id="controls-${index}" style="display:none;">
+            <button class="score-btn minus" onclick="modificarNota(${index}, -0.5)">-0.5</button>
+            <button class="score-btn plus" onclick="modificarNota(${index}, 0.5)">+0.5</button>
+          </div>
         `;
         modalBody.appendChild(cardDiv);
       });
 
       document.getElementById('modalGrupos').classList.add('active');
+
+      // Reproducir música instrumental de Mazinger Z (ID: FQpXZG_u4hw)
+      document.getElementById('youtubeAudio').src = "https://www.youtube.com/embed/FQpXZG_u4hw?autoplay=1";
+
+      // Iniciar cuenta regresiva de 2 minutos (120 segundos)
+      iniciarTemporizador(120, grupos.length);
     }
+
+    function iniciarTemporizador(duracionSegundos, totalGrupos) {
+      clearInterval(timerInterval);
+      let tiempoRestante = duracionSegundos;
+      const timerDisplay = document.getElementById('timerDisplay');
+
+      function actualizarReloj() {
+        let minutos = Math.floor(tiempoRestante / 60);
+        let segundos = tiempoRestante % 60;
+        timerDisplay.textContent = `${minutos < 10 ? '0' : ''}${minutos}:${segundos < 10 ? '0' : ''}${segundos}`;
+
+        if (tiempoRestante <= 0) {
+          clearInterval(timerInterval);
+          timerDisplay.textContent = "¡TIEMPO CUMPLIDO!";
+          // Apagar música al terminar el tiempo
+          document.getElementById('youtubeAudio').src = "";
+          // Mostrar los botones de calificación
+          for (let i = 0; i < totalGrupos; i++) {
+            const ctrl = document.getElementById(`controls-${i}`);
+            if (ctrl) ctrl.style.display = 'flex';
+          }
+        }
+        tiempoRestante--;
+      }
+
+      actualizarReloj();
+      timerInterval = setInterval(actualizarReloj, 1000);
+    }
+
+    window.modificarNota = function(grupoIdx, cambio) {
+      if (puntajesGrupos[grupoIdx] === undefined) puntajesGrupos[grupoIdx] = 10.0;
+      puntajesGrupos[grupoIdx] += cambio;
+      if (puntajesGrupos[grupoIdx] < 0) puntajesGrupos[grupoIdx] = 0;
+
+      const badge = document.getElementById(`score-badge-${grupoIdx}`);
+      if (badge) badge.textContent = `Nota: ${puntajesGrupos[grupoIdx].toFixed(1)}`;
+    };
 
     window.copiarGrupo = function(index) {
       const g = gruposUltimos[index];
-      let texto = `*Grupo ${index + 1}*\n` + g.map(m => `- ${m.nombre}`).join('\n');
+      let texto = `*Grupo ${index + 1} (Nota: ${puntajesGrupos[index].toFixed(1)})*\n` + g.map(m => `- ${m.nombre}`).join('\n');
       navigator.clipboard.writeText(texto).then(() => {
         alert(`¡Grupo ${index + 1} copiado al portapapeles!`);
       }).catch(err => {
@@ -868,7 +1000,7 @@
     window.copiarTodosLosGrupos = function() {
       let textoTotal = "EQUIPOS DE TRABAJO - 1 BGU\n\n";
       gruposUltimos.forEach((g, index) => {
-        textoTotal += `*Grupo ${index + 1}*\n` + g.map(m => `- ${m.nombre}`).join('\n') + "\n\n";
+        textoTotal += `*Grupo ${index + 1} (Nota: ${puntajesGrupos[index].toFixed(1)})*\n` + g.map(m => `- ${m.nombre}`).join('\n') + "\n\n";
       });
       navigator.clipboard.writeText(textoTotal.trim()).then(() => {
         alert("¡Todos los grupos fueron copiados al portapapeles!");
@@ -878,6 +1010,8 @@
     }
 
     window.cerrarModalGrupos = function() {
+      clearInterval(timerInterval);
+      document.getElementById('youtubeAudio').src = "";
       document.getElementById('modalGrupos').classList.remove('active');
     }
 
