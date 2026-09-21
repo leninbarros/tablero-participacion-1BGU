@@ -53,6 +53,58 @@
       letter-spacing: 1px;
     }
 
+    /* SWITCH DE VISTA PROFESOR / ESTUDIANTE */
+    .view-switch-container {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: bold;
+      color: #94a3b8;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 36px;
+      height: 20px;
+    }
+
+    .switch input { 
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #334155;
+      transition: .3s;
+      border-radius: 20px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 14px;
+      width: 14px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .3s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: #0284c7;
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(16px);
+    }
+
     .grid-container {
       display: grid;
       grid-template-columns: repeat(6, 1fr);
@@ -72,10 +124,10 @@
       }
     }
 
-    /* ESTILO BASE DE LA TARJETA */
+    /* ESTILO BASE DE LA TARJETA (MODO ESTUDIANTE POR DEFECTO) */
     .student-card {
-      background-color: #1e293b;
-      border: 1px solid #334155;
+      background-color: #fef08a;
+      border: 1px solid #eab308;
       border-radius: 6px;
       padding: 6px;
       display: flex;
@@ -90,7 +142,7 @@
     }
 
     .student-card:hover {
-      filter: brightness(1.15);
+      filter: brightness(1.05);
     }
 
     /* INDICADOR DE NOTAS */
@@ -104,7 +156,7 @@
       border-radius: 50%;
       display: none;
     }
-    .student-card.has-notes .note-indicator {
+    .student-card.has-notes.teacher-mode .note-indicator {
       display: block;
     }
 
@@ -117,47 +169,16 @@
       font-size: 16px;
       font-weight: bold;
       pointer-events: none;
+      display: none;
+    }
+    .student-card.teacher-mode.cat-avanzado .star-badge {
+      display: block;
     }
 
-    /* CATEGORÍAS */
-    .student-card.cat-avanzado {
-      background-color: #fef08a;
-      border-color: #eab308;
-    }
-    .student-card.cat-avanzado .student-number { background-color: #ca8a04; color: #fef08a; }
-    .student-card.cat-avanzado .student-lastname { color: #854d0e; }
-    .student-card.cat-avanzado .student-name { color: #713f12; }
-
-    .student-card.cat-ayuda {
-      background-color: #e9d5ff;
-      border-color: #a855f7;
-    }
-    .student-card.cat-ayuda .student-number { background-color: #7e22ce; color: #f3e8ff; }
-    .student-card.cat-ayuda .student-lastname { color: #6b21a8; }
-    .student-card.cat-ayuda .student-name { color: #581c87; }
-
-    /* ESTADO USADO */
-    .student-card.used {
-      background-color: #1e293b !important;
-      border-color: #334155 !important;
-      opacity: 0.3;
-    }
-    .student-card.used .student-number { background-color: #475569 !important; color: #94a3b8 !important; }
-    .student-card.used .student-lastname,
-    .student-card.used .student-name { color: #64748b !important; text-decoration: line-through; }
-    .student-card.used .star-badge { opacity: 0.2; }
-
-    .number-lastname-row {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      gap: 4px;
-      width: 100%;
-    }
-
-    .student-number {
-      background-color: #38bdf8;
-      color: #0f172a;
+    /* MODO ESTUDIANTE: NÚMEROS Y LETRAS DE COLOR AZUL */
+    .student-card .student-number {
+      background-color: #0284c7;
+      color: #fef08a;
       font-weight: bold;
       min-width: 18px;
       height: 16px;
@@ -169,25 +190,68 @@
       flex-shrink: 0;
     }
 
-    .student-lastname {
+    .student-card .student-lastname {
       font-size: 11px;
       font-weight: bold;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      color: #38bdf8;
+      color: #1e3a8a;
       flex-grow: 1;
     }
 
-    .student-name {
+    .student-card .student-name {
       font-size: 15px;
       font-weight: bold;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      color: #f1f5f9;
+      color: #1e3a8a;
       width: 100%;
       text-align: center;
+    }
+
+    /* MODO PROFESOR: CATEGORÍAS */
+    .student-card.teacher-mode.cat-avanzado {
+      background-color: #fef08a;
+      border-color: #eab308;
+    }
+    .student-card.teacher-mode.cat-avanzado .student-number { background-color: #ca8a04; color: #fef08a; }
+    .student-card.teacher-mode.cat-avanzado .student-lastname { color: #854d0e; }
+    .student-card.teacher-mode.cat-avanzado .student-name { color: #713f12; }
+
+    .student-card.teacher-mode.cat-ayuda {
+      background-color: #e9d5ff;
+      border-color: #a855f7;
+    }
+    .student-card.teacher-mode.cat-ayuda .student-number { background-color: #7e22ce; color: #f3e8ff; }
+    .student-card.teacher-mode.cat-ayuda .student-lastname { color: #6b21a8; }
+    .student-card.teacher-mode.cat-ayuda .student-name { color: #581c87; }
+
+    .student-card.teacher-mode.cat-promedio {
+      background-color: #1e293b;
+      border-color: #334155;
+    }
+    .student-card.teacher-mode.cat-promedio .student-number { background-color: #38bdf8; color: #0f172a; }
+    .student-card.teacher-mode.cat-promedio .student-lastname { color: #38bdf8; }
+    .student-card.teacher-mode.cat-promedio .student-name { color: #f1f5f9; }
+
+    /* ESTADO USADO */
+    .student-card.used {
+      background-color: #1e293b !important;
+      border-color: #334155 !important;
+      opacity: 0.3;
+    }
+    .student-card.used .student-number { background-color: #475569 !important; color: #94a3b8 !important; }
+    .student-card.used .student-lastname,
+    .student-card.used .student-name { color: #64748b !important; text-decoration: line-through; }
+
+    .number-lastname-row {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 4px;
+      width: 100%;
     }
 
     footer {
@@ -421,7 +485,7 @@
 
     /* ESTILO RELOJ DIGITAL PARA LA CALIFICACIÓN */
     .digital-score-container {
-      display: none; /* Oculto durante los 2 minutos de música */
+      display: none;
       align-items: center;
       justify-content: center;
       gap: 6px;
@@ -479,20 +543,28 @@
 
   <header>
     <h1>REGISTRO DE PARTICIPACIÓN - 1 BGU</h1>
+    <div class="view-switch-container">
+      <span>Modo Estudiante</span>
+      <label class="switch">
+        <input type="checkbox" id="teacherModeToggle" onchange="toggleTeacherMode()">
+        <span class="slider"></span>
+      </label>
+      <span>Modo Profesor</span>
+    </div>
   </header>
 
   <div class="grid-container" id="grid"></div>
 
   <footer>
-    <button class="action-btn group-btn" onclick="generarGrupos()">⚔️ Crear Grupos Épicos</button>
+    <button class="action-btn group-btn" onclick="generarGrupos()">Crear Grupos</button>
     <button class="action-btn reset-btn" onclick="resetAll()">Restaurar Todo el Tablero</button>
   </footer>
 
-  <!-- MODAL DE GRUPOS ÉPICOS -->
+  <!-- MODAL DE GRUPOS -->
   <div class="modal-overlay" id="modalGrupos">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>⚔️ Equipos de Trabajo</h2>
+        <h2>Equipos de Trabajo</h2>
         <button class="close-modal" onclick="cerrarModalGrupos()">×</button>
       </div>
       <div class="modal-actions-top">
@@ -508,7 +580,7 @@
     </div>
   </div>
 
-  <!-- REPRODUCTOR OCULTO DE YOUTUBE (Mazinger Z Instrumental - FQpXZG_u4hw) -->
+  <!-- REPRODUCTOR OCULTO DE YOUTUBE -->
   <div id="audioContainer">
     <iframe id="youtubeAudio" width="200" height="200" src="" frameborder="0" allow="autoplay"></iframe>
   </div>
@@ -587,8 +659,20 @@
     let gruposUltimos = [];
     let puntajesGrupos = {};
     let timerInterval = null;
+    let isTeacherMode = false;
 
-    // Función inteligente para extraer el primer nombre y evaluar duplicados en el curso
+    window.toggleTeacherMode = function() {
+      isTeacherMode = document.getElementById('teacherModeToggle').checked;
+      const cards = document.querySelectorAll('.student-card');
+      cards.forEach(card => {
+        if (isTeacherMode) {
+          card.classList.add('teacher-mode');
+        } else {
+          card.classList.remove('teacher-mode');
+        }
+      });
+    };
+
     function obtenerNombreParaGrupo(alumno, listaAlumnos) {
       let apellido = "";
       let primerNombre = "";
@@ -600,17 +684,15 @@
         primerNombre = nombresPartes[0];
       } else {
         let partes = alumno.nombre.trim().split(/\s+/);
-        apellido = partes[partes.length - 1]; // Asumimos último o primero según formato
+        apellido = partes[partes.length - 1];
         primerNombre = partes[0];
       }
 
-      // Comprobar cuántos alumnos comparten el mismo primer nombre en el curso
       let repetidos = listaAlumnos.filter(a => {
         let pName = a.nombre.includes(',') ? a.nombre.split(',')[1].trim().split(/\s+/)[0] : a.nombre.trim().split(/\s+/)[0];
         return pName === primerNombre;
       });
 
-      // Si hay más de uno con el mismo primer nombre, le añadimos la inicial del apellido
       if (repetidos.length > 1 && apellido.length > 0) {
         return `${primerNombre} ${apellido.charAt(0)}.`;
       }
@@ -661,7 +743,7 @@
       card.className = `student-card ${catClass}`;
       card.id = `card-${alumno.id}`;
 
-      const estrellaHtml = alumno.categoria === 'avanzado' ? '<div class="star-badge">★</div>' : '';
+      const estrellaHtml = '<div class="star-badge">★</div>';
 
       card.innerHTML = `
         <div class="note-indicator"></div>
@@ -676,7 +758,9 @@
       let pressTimer = null;
       const startPress = () => {
         pressTimer = setTimeout(() => {
-          abrirBitacora(alumno.id, alumno.nombre);
+          if (isTeacherMode) {
+            abrirBitacora(alumno.id, alumno.nombre);
+          }
         }, 600);
       };
       const cancelPress = () => clearTimeout(pressTimer);
@@ -708,6 +792,7 @@
     }
 
     window.abrirBitacora = function(id, nombreCompleto) {
+      if (!isTeacherMode) return;
       alumnoActualId = id;
       alumnoActualNombre = nombreCompleto;
       editandoIndice = null;
@@ -881,50 +966,37 @@
         return;
       }
 
-      let ayudas = shuffle(disponibles.filter(a => a.categoria === 'ayuda'));
-      let avanzados = shuffle(disponibles.filter(a => a.categoria === 'avanzado'));
-      let promedios = shuffle(disponibles.filter(a => a.categoria === 'promedio'));
-
+      let lista = shuffle([...disponibles]);
       let grupos = [];
       let idsSeleccionados = [];
 
-      while (ayudas.length > 0 && avanzados.length > 0) {
-        let ayu = ayudas.pop();
-        let av = avanzados.pop();
-        let grupoActual = [ayu, av];
-        idsSeleccionados.push(ayu.id, av.id);
+      let total = lista.length;
+      let i = 0;
 
-        if (promedios.length > 0) {
-          let prom = promedios.pop();
-          grupoActual.push(prom);
-          idsSeleccionados.push(prom.id);
+      // Generar estrictamente grupos de 3 mientras sea posible
+      while (total - i >= 3) {
+        let grupoActual = [];
+        for (let j = 0; j < 3; j++) {
+          let alumnoObj = lista[i++];
+          grupoActual.push(alumnoObj);
+          idsSeleccionados.push(alumnoObj.id);
         }
         grupos.push(grupoActual);
       }
 
-      let remanentes = [...ayudas, ...avanzados, ...promedios];
-      shuffle(remanentes);
-
-      while (remanentes.length > 0) {
-        if (remanentes.length === 1 && grupos.length > 0) {
-          let ultimo = remanentes.pop();
-          grupos[grupos.length - 1].push(ultimo);
-          idsSeleccionados.push(ultimo.id);
-        } else if (remanentes.length >= 2) {
-          let cantidadTomar = (remanentes.length === 3) ? 3 : 2;
-          let subGrupo = remanentes.splice(0, cantidadTomar);
-          subGrupo.forEach(s => idsSeleccionados.push(s.id));
-          grupos.push(subGrupo);
-        } else {
-          let solo = remanentes.pop();
-          idsSeleccionados.push(solo.id);
-          grupos.push([solo]);
+      // Si sobran alumnos (1 o 2), se agrupan juntos al final como residuo
+      if (i < total) {
+        let grupoSobrante = [];
+        while (i < total) {
+          let alumnoObj = lista[i++];
+          grupoSobrante.push(alumnoObj);
+          idsSeleccionados.push(alumnoObj.id);
         }
+        grupos.push(grupoSobrante);
       }
 
       gruposUltimos = grupos;
 
-      // Inicializar puntajes grupales en 10.0
       grupos.forEach((_, idx) => {
         if (puntajesGrupos[idx] === undefined) puntajesGrupos[idx] = 10.0;
       });
@@ -941,16 +1013,14 @@
         let cardDiv = document.createElement('div');
         cardDiv.className = 'group-card';
         
-        // Muestra el nombre optimizado (con inicial de apellido solo si hay nombres repetidos)
         let htmlMembers = g.map(m => `<div class="group-member-name">${obtenerNombreParaGrupo(m, alumnos)}</div>`).join('');
 
         cardDiv.innerHTML = `
           <div class="group-card-header">
-            <h3>Grupo ${index + 1}</h3>
+            <h3>Grupo ${index + 1} (${g.length} pers.)</h3>
             <button class="btn-copy-group" onclick="copiarGrupo(${index})">📋 Copiar</button>
           </div>
 
-          <!-- RELOJ DIGITAL Y CONTROLES (Ocultos inicialmente, aparecen al terminar el tiempo) -->
           <div class="digital-score-container" id="digital-container-${index}">
             <button class="score-btn minus" onclick="modificarNota(${index}, -0.5)">-0.5</button>
             <div class="digital-clock" id="score-clock-${index}">10.0</div>
@@ -966,10 +1036,8 @@
 
       document.getElementById('modalGrupos').classList.add('active');
 
-      // Reproducir música instrumental de Mazinger Z de forma oculta (ID: FQpXZG_u4hw)
       document.getElementById('youtubeAudio').src = "https://www.youtube.com/embed/FQpXZG_u4hw?autoplay=1";
 
-      // Iniciar cuenta regresiva de 2 minutos (120 segundos)
       iniciarTemporizador(120, grupos.length);
     }
 
@@ -986,10 +1054,8 @@
         if (tiempoRestante <= 0) {
           clearInterval(timerInterval);
           timerDisplay.textContent = "¡LISTOS!";
-          // Apagar la música al terminar el tiempo
           document.getElementById('youtubeAudio').src = "";
           
-          // Revelar los relojes digitales de calificación y botones para cada grupo
           for (let i = 0; i < totalGrupos; i++) {
             const container = document.getElementById(`digital-container-${i}`);
             if (container) container.style.display = 'flex';
