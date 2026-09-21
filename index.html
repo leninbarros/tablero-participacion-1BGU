@@ -588,14 +588,34 @@
     let puntajesGrupos = {};
     let timerInterval = null;
 
-    function obtenerPrimerNombre(nombreCompleto) {
-      // Si el nombre viene en formato "APELLIDO, NOMBRE"
-      if (nombreCompleto.includes(',')) {
-        let partes = nombreCompleto.split(',')[1].trim().split(/\s+/);
-        return partes[0];
+    // Función inteligente para extraer el primer nombre y evaluar duplicados en el curso
+    function obtenerNombreParaGrupo(alumno, listaAlumnos) {
+      let apellido = "";
+      let primerNombre = "";
+
+      if (alumno.nombre.includes(',')) {
+        let partes = alumno.nombre.split(',');
+        apellido = partes[0].trim();
+        let nombresPartes = partes[1].trim().split(/\s+/);
+        primerNombre = nombresPartes[0];
+      } else {
+        let partes = alumno.nombre.trim().split(/\s+/);
+        apellido = partes[partes.length - 1]; // Asumimos último o primero según formato
+        primerNombre = partes[0];
       }
-      let partes = nombreCompleto.trim().split(/\s+/);
-      return partes[0];
+
+      // Comprobar cuántos alumnos comparten el mismo primer nombre en el curso
+      let repetidos = listaAlumnos.filter(a => {
+        let pName = a.nombre.includes(',') ? a.nombre.split(',')[1].trim().split(/\s+/)[0] : a.nombre.trim().split(/\s+/)[0];
+        return pName === primerNombre;
+      });
+
+      // Si hay más de uno con el mismo primer nombre, le añadimos la inicial del apellido
+      if (repetidos.length > 1 && apellido.length > 0) {
+        return `${primerNombre} ${apellido.charAt(0)}.`;
+      }
+
+      return primerNombre;
     }
 
     function formatearNombre(nombresStr) {
@@ -921,8 +941,8 @@
         let cardDiv = document.createElement('div');
         cardDiv.className = 'group-card';
         
-        // Muestra únicamente el PRIMER NOMBRE de cada integrante sin apellidos
-        let htmlMembers = g.map(m => `<div class="group-member-name">${obtenerPrimerNombre(m.nombre)}</div>`).join('');
+        // Muestra el nombre optimizado (con inicial de apellido solo si hay nombres repetidos)
+        let htmlMembers = g.map(m => `<div class="group-member-name">${obtenerNombreParaGrupo(m, alumnos)}</div>`).join('');
 
         cardDiv.innerHTML = `
           <div class="group-card-header">
@@ -993,7 +1013,7 @@
 
     window.copiarGrupo = function(index) {
       const g = gruposUltimos[index];
-      let texto = `*Grupo ${index + 1} (Nota: ${puntajesGrupos[index].toFixed(1)})*\n` + g.map(m => `- ${obtenerPrimerNombre(m.nombre)}`).join('\n');
+      let texto = `*Grupo ${index + 1} (Nota: ${puntajesGrupos[index].toFixed(1)})*\n` + g.map(m => `- ${obtenerNombreParaGrupo(m, alumnos)}`).join('\n');
       navigator.clipboard.writeText(texto).then(() => {
         alert(`¡Grupo ${index + 1} copiado al portapapeles!`);
       });
@@ -1002,7 +1022,7 @@
     window.copiarTodosLosGrupos = function() {
       let textoTotal = "EQUIPOS DE TRABAJO - 1 BGU\n\n";
       gruposUltimos.forEach((g, index) => {
-        textoTotal += `*Grupo ${index + 1} (Nota: ${puntajesGrupos[index].toFixed(1)})*\n` + g.map(m => `- ${obtenerPrimerNombre(m.nombre)}`).join('\n') + "\n\n";
+        textoTotal += `*Grupo ${index + 1} (Nota: ${puntajesGrupos[index].toFixed(1)})*\n` + g.map(m => `- ${obtenerNombreParaGrupo(m, alumnos)}`).join('\n') + "\n\n";
       });
       navigator.clipboard.writeText(textoTotal.trim()).then(() => {
         alert("¡Todos los grupos fueron copiados al portapapeles!");
