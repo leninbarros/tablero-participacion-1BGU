@@ -38,7 +38,7 @@
 
     header {
       background-color: #1e293b;
-      padding: 6px 10px;
+      padding: 4px 10px;
       text-align: center;
       border-bottom: 2px solid #38bdf8;
       flex-shrink: 0;
@@ -49,7 +49,7 @@
 
     h1 {
       margin: 0;
-      font-size: 18px;
+      font-size: 16px;
       letter-spacing: 1px;
     }
 
@@ -57,8 +57,8 @@
       display: grid;
       grid-template-columns: repeat(6, 1fr);
       grid-template-rows: repeat(4, 1fr);
-      gap: 6px;
-      padding: 6px;
+      gap: 4px;
+      padding: 4px;
       flex-grow: 1;
       width: 100%;
       height: 100%;
@@ -77,12 +77,12 @@
       background-color: #1e293b;
       border: 1px solid #334155;
       border-radius: 6px;
-      padding: 8px;
+      padding: 6px;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      gap: 6px;
+      gap: 4px;
       transition: all 0.2s ease;
       overflow: hidden;
       cursor: pointer;
@@ -96,10 +96,10 @@
     /* INDICADOR DE NOTAS */
     .note-indicator {
       position: absolute;
-      top: 4px;
-      left: 6px;
-      width: 8px;
-      height: 8px;
+      top: 3px;
+      left: 5px;
+      width: 6px;
+      height: 6px;
       background-color: #38bdf8;
       border-radius: 50%;
       display: none;
@@ -111,17 +111,11 @@
     /* ESTRELLA PARA AVANZADOS */
     .star-badge {
       position: absolute;
-      top: 3px;
-      right: 5px;
+      top: 2px;
+      right: 4px;
       color: #facc15;
-      font-size: 20px;
+      font-size: 16px;
       font-weight: bold;
-      text-shadow: 
-        -1px -1px 0 #713f12,  
-         1px -1px 0 #713f12,
-        -1px  1px 0 #713f12,
-         1px  1px 0 #713f12,
-         0 2px 4px rgba(0, 0, 0, 0.4);
       pointer-events: none;
     }
 
@@ -157,7 +151,7 @@
       display: flex;
       flex-direction: row;
       align-items: center;
-      gap: 6px;
+      gap: 4px;
       width: 100%;
     }
 
@@ -165,18 +159,18 @@
       background-color: #38bdf8;
       color: #0f172a;
       font-weight: bold;
-      min-width: 22px;
-      height: 18px;
+      min-width: 18px;
+      height: 16px;
       border-radius: 3px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 12px;
+      font-size: 10px;
       flex-shrink: 0;
     }
 
     .student-lastname {
-      font-size: 12px;
+      font-size: 11px;
       font-weight: bold;
       white-space: nowrap;
       overflow: hidden;
@@ -186,7 +180,7 @@
     }
 
     .student-name {
-      font-size: 18px;
+      font-size: 15px;
       font-weight: bold;
       white-space: nowrap;
       overflow: hidden;
@@ -197,7 +191,7 @@
     }
 
     footer {
-      padding: 6px 10px;
+      padding: 4px 10px;
       text-align: center;
       background-color: #0f172a;
       flex-shrink: 0;
@@ -208,14 +202,14 @@
 
     .action-btn {
       border: none;
-      padding: 6px 14px;
+      padding: 5px 12px;
       border-radius: 4px;
       cursor: pointer;
       font-weight: bold;
-      font-size: 13px;
+      font-size: 12px;
       display: flex;
       align-items: center;
-      gap: 5px;
+      gap: 4px;
     }
 
     .reset-btn { background-color: #ef4444; color: white; }
@@ -232,7 +226,7 @@
       position: fixed;
       top: 0; left: 0;
       width: 100vw; height: 100dvh;
-      background: rgba(15, 23, 42, 0.85);
+      background: rgba(15, 23, 42, 0.9);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -250,12 +244,12 @@
       background-color: #1e293b;
       border: 2px solid #38bdf8;
       border-radius: 8px;
-      width: 90%;
-      max-width: 700px;
-      max-height: 85vh;
+      width: 96%;
+      max-width: 950px;
+      max-height: 94vh;
       display: flex;
       flex-direction: column;
-      padding: 16px;
+      padding: 10px;
       box-shadow: 0 10px 25px rgba(0,0,0,0.5);
     }
 
@@ -264,13 +258,13 @@
       justify-content: space-between;
       align-items: center;
       border-bottom: 1px solid #334155;
-      padding-bottom: 8px;
-      margin-bottom: 12px;
+      padding-bottom: 4px;
+      margin-bottom: 6px;
     }
 
     .modal-header h2 {
       margin: 0;
-      font-size: 18px;
+      font-size: 16px;
       color: #38bdf8;
     }
 
@@ -278,7 +272,7 @@
       background: none;
       border: none;
       color: #94a3b8;
-      font-size: 20px;
+      font-size: 18px;
       cursor: pointer;
     }
     .close-modal:hover { color: #fff; }
@@ -288,42 +282,42 @@
       flex-grow: 1;
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      padding-right: 4px;
+      gap: 6px;
+      padding-right: 2px;
     }
 
     /* BITÁCORA */
     .bitacora-textarea {
       width: 100%;
-      height: 80px;
+      height: 70px;
       background-color: #0f172a;
       color: #f8fafc;
       border: 1px solid #334155;
       border-radius: 4px;
-      padding: 8px;
+      padding: 6px;
       resize: vertical;
       font-family: inherit;
-      font-size: 14px;
+      font-size: 13px;
     }
     .bitacora-textarea:focus { outline: none; border-color: #38bdf8; }
 
     .historial-lista {
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      max-height: 220px;
+      gap: 6px;
+      max-height: 180px;
       overflow-y: auto;
-      margin-top: 5px;
+      margin-top: 4px;
     }
     .nota-item {
       background-color: #0f172a;
       border-left: 3px solid #38bdf8;
-      padding: 8px;
+      padding: 6px;
       border-radius: 4px;
-      font-size: 13px;
+      font-size: 12px;
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 3px;
     }
     .nota-header-row {
       display: flex;
@@ -331,18 +325,18 @@
       align-items: center;
     }
     .nota-fecha {
-      font-size: 11px;
+      font-size: 10px;
       color: #94a3b8;
     }
     .nota-acciones {
       display: flex;
-      gap: 6px;
+      gap: 5px;
     }
     .btn-acc {
       background: none;
       border: none;
       cursor: pointer;
-      font-size: 12px;
+      font-size: 11px;
       padding: 0;
     }
     .btn-editar { color: #38bdf8; }
@@ -352,117 +346,110 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-top: 5px;
+      margin-top: 4px;
     }
 
-    /* GRUPOS Y PANTALLA ÉPICA */
+    /* GRUPOS Y PANTALLA ÉPICA COMPACTA */
     .modal-actions-top {
       display: flex;
       justify-content: flex-end;
-      gap: 8px;
-      margin-bottom: 8px;
+      gap: 6px;
+      margin-bottom: 6px;
     }
 
     .epic-banner {
       text-align: center;
       background: linear-gradient(135deg, #1e1b4b, #311042);
-      border: 2px solid #a855f7;
-      border-radius: 8px;
-      padding: 10px;
-      margin-bottom: 12px;
+      border: 1px solid #a855f7;
+      border-radius: 6px;
+      padding: 6px;
+      margin-bottom: 6px;
     }
     .countdown-timer {
-      font-size: 2.2rem;
+      font-size: 1.8rem;
       font-weight: 900;
       color: #facc15;
-      text-shadow: 0 0 10px rgba(250, 204, 21, 0.5);
-      margin: 3px 0;
+      text-shadow: 0 0 8px rgba(250, 204, 21, 0.4);
+      margin: 1px 0;
     }
 
     .group-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 10px;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 6px;
     }
     .group-card {
       background-color: #0f172a;
       border: 1px solid #334155;
       border-radius: 6px;
-      padding: 10px;
+      padding: 6px;
       position: relative;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      align-items: center;
     }
     .group-card-header {
+      width: 100%;
       display: flex;
       justify-content: space-between;
       align-items: center;
       border-bottom: 1px solid #1e293b;
-      padding-bottom: 5px;
-      margin-bottom: 6px;
+      padding-bottom: 3px;
+      margin-bottom: 4px;
     }
     .group-card h3 {
       margin: 0;
-      font-size: 14px;
+      font-size: 12px;
       color: #facc15;
       display: flex;
       align-items: center;
-      gap: 8px;
-    }
-    .group-score-badge {
-      background-color: #0284c7;
-      color: white;
-      font-weight: bold;
-      font-size: 12px;
-      padding: 2px 7px;
-      border-radius: 10px;
+      gap: 6px;
     }
     .btn-copy-group {
       background: none;
       border: none;
       cursor: pointer;
-      font-size: 12px;
+      font-size: 11px;
       color: #38bdf8;
-      padding: 2px 6px;
+      padding: 1px 4px;
       border-radius: 3px;
     }
     .btn-copy-group:hover {
       background-color: #1e293b;
     }
-    .group-members-list {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      margin-bottom: 8px;
-    }
-    .group-member {
-      font-size: 13px;
-      padding: 2px 0;
-      display: flex;
-      justify-content: space-between;
-    }
-    .member-role {
-      font-size: 11px;
-      padding: 1px 5px;
-      border-radius: 3px;
-    }
-    .role-ayuda { background-color: #7e22ce; color: #f3e8ff; }
-    .role-avanzado { background-color: #ca8a04; color: #fef08a; }
-    .role-promedio { background-color: #475569; color: #f8fafc; }
 
-    .score-controls {
-      display: flex;
+    /* ESTILO RELOJ DIGITAL PARA LA CALIFICACIÓN */
+    .digital-score-container {
+      display: none; /* Oculto durante los 2 minutos de música */
+      align-items: center;
+      justify-content: center;
       gap: 6px;
-      justify-content: flex-end;
+      background-color: #020617;
+      border: 1px solid #334155;
+      border-radius: 4px;
+      padding: 3px 6px;
+      margin: 3px 0;
+      width: 100%;
+    }
+    .digital-clock {
+      font-family: monospace;
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #38bdf8;
+      background-color: #0f172a;
+      padding: 1px 8px;
+      border-radius: 3px;
+      letter-spacing: 1px;
+      border: 1px solid #1e293b;
     }
     .score-btn {
       background-color: #334155;
       color: white;
       border: none;
-      padding: 3px 8px;
-      border-radius: 4px;
-      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 10px;
       font-weight: bold;
       cursor: pointer;
     }
@@ -470,6 +457,20 @@
     .score-btn.plus:hover { background-color: #15803d; }
     .score-btn.minus { background-color: #dc2626; }
     .score-btn.minus:hover { background-color: #b91c1c; }
+
+    .group-members-list {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      text-align: center;
+      margin-top: 2px;
+    }
+    .group-member-name {
+      font-size: 12px;
+      color: #f8fafc;
+      font-weight: 500;
+    }
 
     #audioContainer { display: none; }
   </style>
@@ -491,17 +492,16 @@
   <div class="modal-overlay" id="modalGrupos">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>⚔️ Equipos de Trabajo - ¡Mazinger Z Activo!</h2>
+        <h2>⚔️ Equipos de Trabajo</h2>
         <button class="close-modal" onclick="cerrarModalGrupos()">×</button>
       </div>
       <div class="modal-actions-top">
-        <button class="action-btn group-btn" style="font-size: 12px; padding: 4px 10px;" onclick="copiarTodosLosGrupos()">📋 Copiar Todos</button>
+        <button class="action-btn group-btn" style="font-size: 11px; padding: 3px 8px;" onclick="copiarTodosLosGrupos()">📋 Copiar Todos</button>
       </div>
       <div class="modal-body">
         <div class="epic-banner">
-          <div style="font-size: 12px; font-weight: bold; color: #c084fc; text-transform: uppercase;">¡Muevan mesas y sillas! Tiempo restante:</div>
+          <div style="font-size: 11px; font-weight: bold; color: #c084fc; text-transform: uppercase;">¡Mueven mesas y sillas! Tiempo restante:</div>
           <div class="countdown-timer" id="timerDisplay">02:00</div>
-          <div style="font-size: 11px; color: #cbd5e1;">Al finalizar el tiempo se habilitarán las calificaciones grupales automáticas.</div>
         </div>
         <div class="group-grid" id="modalBodyGrupos"></div>
       </div>
@@ -515,21 +515,21 @@
 
   <!-- MODAL DE BITÁCORA / EXPEDIENTE -->
   <div class="modal-overlay" id="modalBitacora">
-    <div class="modal-content">
+    <div class="modal-content" style="max-width: 550px;">
       <div class="modal-header">
         <h2 id="tituloBitacora">Bitácora del Estudiante</h2>
         <button class="close-modal" onclick="cerrarModalBitacora()">×</button>
       </div>
       <div class="modal-body">
-        <label id="labelEditorNota" style="font-size: 13px; color: #38bdf8; font-weight: bold;">Agregar nueva nota o compromiso:</label>
+        <label id="labelEditorNota" style="font-size: 12px; color: #38bdf8; font-weight: bold;">Agregar nueva nota o compromiso:</label>
         <textarea id="textoNuevaNota" class="bitacora-textarea" placeholder="Escribe aquí acuerdos, adaptaciones o ideas de mejora..."></textarea>
         
         <div class="modal-footer-actions">
           <button class="action-btn group-btn" id="btnGuardarNota" onclick="guardarNotaBitacora()">💾 Guardar Nota</button>
-          <button class="action-btn pdf-btn" onclick="descargarPDFBitacora()">📄 Descargar Reporte PDF</button>
+          <button class="action-btn pdf-btn" onclick="descargarPDFBitacora()">📄 Reporte PDF</button>
         </div>
         
-        <label style="font-size: 13px; color: #94a3b8; font-weight: bold; margin-top: 10px;">Historial de Bitácora:</label>
+        <label style="font-size: 12px; color: #94a3b8; font-weight: bold; margin-top: 6px;">Historial de Bitácora:</label>
         <div class="historial-lista" id="historialLista"></div>
       </div>
     </div>
@@ -587,6 +587,16 @@
     let gruposUltimos = [];
     let puntajesGrupos = {};
     let timerInterval = null;
+
+    function obtenerPrimerNombre(nombreCompleto) {
+      // Si el nombre viene en formato "APELLIDO, NOMBRE"
+      if (nombreCompleto.includes(',')) {
+        let partes = nombreCompleto.split(',')[1].trim().split(/\s+/);
+        return partes[0];
+      }
+      let partes = nombreCompleto.trim().split(/\s+/);
+      return partes[0];
+    }
 
     function formatearNombre(nombresStr) {
       const partes = nombresStr.trim().split(/\s+/);
@@ -700,7 +710,7 @@
       const notas = bitacorasGlobal[alumnoActualId] || [];
 
       if (notas.length === 0) {
-        lista.innerHTML = '<div style="color: #64748b; font-size: 13px; text-align: center; padding: 10px;">No hay notas registradas todavía.</div>';
+        lista.innerHTML = '<div style="color: #64748b; font-size: 12px; text-align: center; padding: 8px;">No hay notas registradas todavía.</div>';
         return;
       }
 
@@ -789,23 +799,23 @@
       const notas = bitacorasGlobal[alumnoActualId] || [];
 
       doc.setFillColor(30, 41, 59);
-      doc.rect(0, 0, 210, 30, "F");
+      doc.rect(0, 0, 210, 25, "F");
 
       doc.setTextColor(255, 255, 255);
       doc.setFont("helvetica", "bold");
-      doc.setFontSize(16);
-      doc.text("REPORTE DE SEGUIMIENTO Y BITÁCORA", 14, 18);
+      doc.setFontSize(14);
+      doc.text("REPORTE DE SEGUIMIENTO Y BITÁCORA", 14, 16);
 
       doc.setTextColor(15, 23, 42);
-      doc.setFontSize(12);
-      doc.text(`Estudiante: ${alumnoActualNombre}`, 14, 45);
-      doc.text(`Fecha de emisión: ${new Date().toLocaleDateString()}`, 14, 53);
+      doc.setFontSize(11);
+      doc.text(`Estudiante: ${alumnoActualNombre}`, 14, 38);
+      doc.text(`Fecha de emisión: ${new Date().toLocaleDateString()}`, 14, 45);
 
       doc.setDrawColor(56, 189, 248);
-      doc.line(14, 58, 196, 58);
+      doc.line(14, 50, 196, 50);
 
-      let yPos = 70;
-      doc.setFontSize(11);
+      let yPos = 60;
+      doc.setFontSize(10);
 
       if (notas.length === 0) {
         doc.setTextColor(100, 100, 100);
@@ -824,15 +834,11 @@
           doc.setTextColor(15, 23, 42);
           
           const textoLineas = doc.splitTextToSize(n.texto, 180);
-          doc.text(textoLineas, 14, yPos + 6);
+          doc.text(textoLineas, 14, yPos + 5);
           
-          yPos += (textoLineas.length * 6) + 14;
+          yPos += (textoLineas.length * 5) + 10;
         });
       }
-
-      doc.setFontSize(9);
-      doc.setTextColor(150, 150, 150);
-      doc.text("Sistema de Acompañamiento Académico - 1 BGU", 14, 285);
 
       doc.save(`Bitacora_${alumnoActualNombre.replace(/[^a-zA-Z]/g, "_")}.pdf`);
     }
@@ -915,27 +921,24 @@
         let cardDiv = document.createElement('div');
         cardDiv.className = 'group-card';
         
-        let htmlMembers = g.map(m => {
-          let roleClass = `role-${m.categoria}`;
-          let roleText = m.categoria === 'ayuda' ? 'Apoyo' : (m.categoria === 'avanzado' ? 'Avanzado ★' : 'Promedio');
-          return `<div class="group-member">
-            <span>${m.nombre}</span>
-            <span class="member-role ${roleClass}">${roleText}</span>
-          </div>`;
-        }).join('');
+        // Muestra únicamente el PRIMER NOMBRE de cada integrante sin apellidos
+        let htmlMembers = g.map(m => `<div class="group-member-name">${obtenerPrimerNombre(m.nombre)}</div>`).join('');
 
         cardDiv.innerHTML = `
           <div class="group-card-header">
-            <h3>
-              <span>Grupo ${index + 1}</span>
-              <button class="btn-copy-group" onclick="copiarGrupo(${index})">📋 Copiar</button>
-            </h3>
-            <div class="group-score-badge" id="score-badge-${index}">Nota: ${puntajesGrupos[index].toFixed(1)}</div>
+            <h3>Grupo ${index + 1}</h3>
+            <button class="btn-copy-group" onclick="copiarGrupo(${index})">📋 Copiar</button>
           </div>
-          <div class="group-members-list">${htmlMembers}</div>
-          <div class="score-controls" id="controls-${index}" style="display:none;">
+
+          <!-- RELOJ DIGITAL Y CONTROLES (Ocultos inicialmente, aparecen al terminar el tiempo) -->
+          <div class="digital-score-container" id="digital-container-${index}">
             <button class="score-btn minus" onclick="modificarNota(${index}, -0.5)">-0.5</button>
+            <div class="digital-clock" id="score-clock-${index}">10.0</div>
             <button class="score-btn plus" onclick="modificarNota(${index}, 0.5)">+0.5</button>
+          </div>
+
+          <div class="group-members-list">
+            ${htmlMembers}
           </div>
         `;
         modalBody.appendChild(cardDiv);
@@ -943,7 +946,7 @@
 
       document.getElementById('modalGrupos').classList.add('active');
 
-      // Reproducir música instrumental de Mazinger Z (ID: FQpXZG_u4hw)
+      // Reproducir música instrumental de Mazinger Z de forma oculta (ID: FQpXZG_u4hw)
       document.getElementById('youtubeAudio').src = "https://www.youtube.com/embed/FQpXZG_u4hw?autoplay=1";
 
       // Iniciar cuenta regresiva de 2 minutos (120 segundos)
@@ -962,13 +965,14 @@
 
         if (tiempoRestante <= 0) {
           clearInterval(timerInterval);
-          timerDisplay.textContent = "¡TIEMPO CUMPLIDO!";
-          // Apagar música al terminar el tiempo
+          timerDisplay.textContent = "¡LISTOS!";
+          // Apagar la música al terminar el tiempo
           document.getElementById('youtubeAudio').src = "";
-          // Mostrar los botones de calificación
+          
+          // Revelar los relojes digitales de calificación y botones para cada grupo
           for (let i = 0; i < totalGrupos; i++) {
-            const ctrl = document.getElementById(`controls-${i}`);
-            if (ctrl) ctrl.style.display = 'flex';
+            const container = document.getElementById(`digital-container-${i}`);
+            if (container) container.style.display = 'flex';
           }
         }
         tiempoRestante--;
@@ -983,29 +987,25 @@
       puntajesGrupos[grupoIdx] += cambio;
       if (puntajesGrupos[grupoIdx] < 0) puntajesGrupos[grupoIdx] = 0;
 
-      const badge = document.getElementById(`score-badge-${grupoIdx}`);
-      if (badge) badge.textContent = `Nota: ${puntajesGrupos[grupoIdx].toFixed(1)}`;
+      const clock = document.getElementById(`score-clock-${grupoIdx}`);
+      if (clock) clock.textContent = puntajesGrupos[grupoIdx].toFixed(1);
     };
 
     window.copiarGrupo = function(index) {
       const g = gruposUltimos[index];
-      let texto = `*Grupo ${index + 1} (Nota: ${puntajesGrupos[index].toFixed(1)})*\n` + g.map(m => `- ${m.nombre}`).join('\n');
+      let texto = `*Grupo ${index + 1} (Nota: ${puntajesGrupos[index].toFixed(1)})*\n` + g.map(m => `- ${obtenerPrimerNombre(m.nombre)}`).join('\n');
       navigator.clipboard.writeText(texto).then(() => {
         alert(`¡Grupo ${index + 1} copiado al portapapeles!`);
-      }).catch(err => {
-        console.error("Error al copiar: ", err);
       });
     }
 
     window.copiarTodosLosGrupos = function() {
       let textoTotal = "EQUIPOS DE TRABAJO - 1 BGU\n\n";
       gruposUltimos.forEach((g, index) => {
-        textoTotal += `*Grupo ${index + 1} (Nota: ${puntajesGrupos[index].toFixed(1)})*\n` + g.map(m => `- ${m.nombre}`).join('\n') + "\n\n";
+        textoTotal += `*Grupo ${index + 1} (Nota: ${puntajesGrupos[index].toFixed(1)})*\n` + g.map(m => `- ${obtenerPrimerNombre(m.nombre)}`).join('\n') + "\n\n";
       });
       navigator.clipboard.writeText(textoTotal.trim()).then(() => {
         alert("¡Todos los grupos fueron copiados al portapapeles!");
-      }).catch(err => {
-        console.error("Error al copiar todos: ", err);
       });
     }
 
