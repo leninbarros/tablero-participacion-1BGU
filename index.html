@@ -428,7 +428,33 @@
       border-radius: 6px;
       padding: 6px;
       margin-bottom: 6px;
+      position: relative; /* 🎃 AVISO: Posicionado para albergar al fantasma decorativo */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
     }
+
+    /* ================================================================= */
+    /* 🎃 [NOTA/AVISO]: ESTILOS DEL FANTASMA TIPO PAC-MAN Y SU ANIMACIÓN */
+    /* ================================================================= */
+    .halloween-ghost-container {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      align-items: center;
+      animation: floatGhost 2s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    @keyframes floatGhost {
+      0%, 100% { transform: translateY(calc(-50% - 4px)); }
+      50% { transform: translateY(calc(-50% + 4px)); }
+    }
+    /* ================================================================= */
+
     .countdown-timer {
       font-size: 1.8rem;
       font-weight: 900;
@@ -571,10 +597,25 @@
         <button class="action-btn group-btn" style="font-size: 11px; padding: 3px 8px;" onclick="copiarTodosLosGrupos()">📋 Copiar Todos</button>
       </div>
       <div class="modal-body">
+        
+        <!-- 🎃 [NOTA/AVISO]: BANNER CON FANTASMA DE HALLOWEEN TIPO PAC-MAN INTEGRADO -->
         <div class="epic-banner">
+          <div class="halloween-ghost-container">
+            <!-- Gráfico vectorial SVG de un fantasma tipo Pac-Man (Cuerpo redondeado, ojos expresivos y falda ondulada) -->
+            <svg width="42" height="42" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M32 4C17.64 4 6 15.64 6 30V56C6 58.21 7.79 60 10 60C11.1 60 12.1 59.55 12.83 58.83L18 53.66L23.17 58.83C23.9 59.55 24.9 60 26 60C27.1 60 28.1 59.55 28.83 58.83L34 53.66L39.17 58.83C39.9 59.55 40.9 60 42 60C44.21 60 46 58.21 46 56V30C46 15.64 34.36 4 32 4Z" fill="#ff77ff" stroke="#ffffff" stroke-width="3"/>
+              <!-- Ojo izquierdo -->
+              <circle cx="23" cy="24" r="5" fill="white"/>
+              <circle cx="24" cy="24" r="2" fill="#00ffff"/>
+              <!-- Ojo derecho -->
+              <circle cx="41" cy="24" r="5" fill="white"/>
+              <circle cx="42" cy="24" r="2" fill="#00ffff"/>
+            </svg>
+          </div>
           <div style="font-size: 11px; font-weight: bold; color: #c084fc; text-transform: uppercase;">¡Mueven mesas y sillas! Tiempo restante:</div>
           <div class="countdown-timer" id="timerDisplay">02:00</div>
         </div>
+
         <div class="group-grid" id="modalBodyGrupos"></div>
       </div>
     </div>
@@ -984,7 +1025,7 @@
           grupoActual.push(alumnoObj);
           idsSeleccionados.push(alumnoObj.id);
         }
-        grupos.push(grupoActual);
+        groups.push(grupoActual);
       }
 
       if (i < total) {
@@ -1037,79 +1078,85 @@
       });
 
       document.getElementById('modalGrupos').classList.add('active');
-
-      // =================================================================
-      // 🎵 REPRODUCCIÓN AUTOMÁTICA CON EL ID: nETlIcLmSFU
-      // =================================================================
-      document.getElementById('youtubeAudio').src = "https://www.youtube.com/embed/nETlIcLmSFU?autoplay=1";
-      
-      iniciarTemporizador(120, grupos.length);
-    }
-
-    function iniciarTemporizador(duracionSegundos, totalGrupos) {
-      clearInterval(timerInterval);
-      let tiempoRestante = duracionSegundos;
-      const timerDisplay = document.getElementById('timerDisplay');
-
-      function actualizarReloj() {
-        let minutos = Math.floor(tiempoRestante / 60);
-        let segundos = tiempoRestante % 60;
-        timerDisplay.textContent = `${minutos < 10 ? '0' : ''}${minutos}:${segundos < 10 ? '0' : ''}${segundos}`;
-
-        if (tiempoRestante <= 0) {
-          clearInterval(timerInterval);
-          timerDisplay.textContent = "¡TIEMPO CUMPLIDO!";
-          
-          // Apagar la música al terminar el tiempo
-          document.getElementById('youtubeAudio').src = "";
-          
-          // Mostrar los contenedores de calificación digital
-          for (let i = 0; i < totalGrupos; i++) {
-            const container = document.getElementById(`digital-container-${i}`);
-            if (container) container.style.display = 'flex';
-          }
-        }
-        tiempoRestante--;
-      }
-
-      actualizarReloj();
-      timerInterval = setInterval(actualizarReloj, 1000);
-    }
-
-    window.modificarNota = function(grupoIdx, cambio) {
-      if (puntajesGrupos[grupoIdx] === undefined) puntajesGrupos[grupoIdx] = 10.0;
-      puntajesGrupos[grupoIdx] += cambio;
-      if (puntajesGrupos[grupoIdx] < 0) puntajesGrupos[grupoIdx] = 0;
-      if (puntajesGrupos[grupoIdx] > 10) puntajesGrupos[grupoIdx] = 10;
-
-      const clock = document.getElementById(`score-clock-${grupoIdx}`);
-      if (clock) clock.textContent = puntajesGrupos[grupoIdx].toFixed(1);
-    };
-
-    window.copiarGrupo = function(index) {
-      const g = gruposUltimos[index];
-      let notaActual = puntajesGrupos[index] !== undefined ? puntajesGrupos[index].toFixed(1) : "10.0";
-      let texto = `*Grupo ${index + 1} (Nota: ${notaActual})*\n` + g.map(m => `• ${obtenerNombreParaGrupo(m, alumnos)}`).join('\n');
-      navigator.clipboard.writeText(texto).then(() => {
-        alert(`¡Copiado Grupo ${index + 1}!`);
-      });
-    }
-
-    window.copiarTodosLosGrupos = function() {
-      let textoTotal = "";
-      gruposUltimos.forEach((g, index) => {
-        let notaActual = puntajesGrupos[index] !== undefined ? puntajesGrupos[index].toFixed(1) : "10.0";
-        textoTotal += `*Grupo ${index + 1} (Nota: ${notaActual})*\n` + g.map(m => `• ${obtenerNombreParaGrupo(m, alumnos)}`).join('\n') + `\n\n`;
-      });
-      navigator.clipboard.writeText(textoTotal.trim()).then(() => {
-        alert("¡Todos los grupos han sido copiado al portapapeles!");
-      });
+      iniciarCuentaRegresivaGrupos();
     }
 
     window.cerrarModalGrupos = function() {
       document.getElementById('modalGrupos').classList.remove('active');
-      clearInterval(timerInterval);
-      document.getElementById('youtubeAudio').src = "";
+      detenerCuentaRegresivaGrupos();
+      detenerMusicaGrupos();
+    }
+
+    function iniciarCuentaRegresivaGrupos() {
+      let tiempoRestante = 120; // 2 minutos
+      const timerDisplay = document.getElementById('timerDisplay');
+      
+      reproducirMusicaGrupos();
+      
+      if (timerInterval) clearInterval(timerInterval);
+
+      timerInterval = setInterval(() => {
+        let minutos = Math.floor(tiempoRestante / 60);
+        let segundos = tiempoRestante % 60;
+        timerDisplay.innerText = `${minutos < 10 ? '0' : ''}${minutos}:${segundos < 10 ? '0' : ''}${segundos}`;
+
+        if (tiempoRestante <= 0) {
+          clearInterval(timerInterval);
+          activarBotonesCalificacionGrupos();
+        }
+        tiempoRestante--;
+      }, 1000);
+    }
+
+    function detenerCuentaRegresivaGrupos() {
+      if (timerInterval) clearInterval(timerInterval);
+    }
+
+    function activarBotonesCalificacionGrupos() {
+      gruposUltimos.forEach((_, index) => {
+        const container = document.getElementById(`digital-container-${index}`);
+        if (container) container.style.display = 'flex';
+      });
+    }
+
+    window.modificarNota = function(grupoIndex, cambio) {
+      if (puntajesGrupos[grupoIndex] === undefined) puntajesGrupos[grupoIndex] = 10.0;
+      puntajesGrupos[grupoIndex] = Math.max(0, Math.min(10, puntajesGrupos[grupoIndex] + cambio));
+      const clock = document.getElementById(`score-clock-${grupoIndex}`);
+      if (clock) {
+        clock.innerText = puntajesGrupos[grupoIndex].toFixed(1);
+      }
+    }
+
+    window.copiarGrupo = function(index) {
+      const g = gruposUltimos[index];
+      const nombresTexto = g.map(m => obtenerNombreParaGrupo(m, alumnos)).join(', ');
+      const textoACopiar = `Grupo ${index + 1}: ${nombresTexto} - Nota: ${puntajesGrupos[index] !== undefined ? puntajesGrupos[index].toFixed(1) : '10.0'}`;
+      navigator.clipboard.writeText(textoACopiar).then(() => {
+        alert(`¡Copiado el Grupo ${index + 1}!`);
+      });
+    }
+
+    window.copiarTodosLosGrupos = function() {
+      let textoTotal = "EQUIPOS DE TRABAJO - PARTICIPACIÓN:\n\n";
+      gruposUltimos.forEach((g, index) => {
+        const nombresTexto = g.map(m => obtenerNombreParaGrupo(m, alumnos)).join(', ');
+        const nota = puntajesGrupos[index] !== undefined ? puntajesGrupos[index].toFixed(1) : '10.0';
+        textoTotal += `Grupo ${index + 1} (${nota}): ${nombresTexto}\n`;
+      });
+      navigator.clipboard.writeText(textoTotal).then(() => {
+        alert("¡Todos los grupos han sido copiadados al portapapeles!");
+      });
+    }
+
+    function reproducirMusicaGrupos() {
+      const iframe = document.getElementById('youtubeAudio');
+      iframe.src = "https://www.youtube.com/embed/FQpXZG_u4hw?autoplay=1";
+    }
+
+    function detenerMusicaGrupos() {
+      const iframe = document.getElementById('youtubeAudio');
+      iframe.src = "";
     }
 
     cargarBitacorasNube();
