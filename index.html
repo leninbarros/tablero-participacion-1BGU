@@ -671,4 +671,71 @@
     };
 
     const app = initializeApp(firebaseConfig);
-    const db =
+    const db = getFirestore(app);
+
+    const alumnos = [
+      { id: 1, nombre: "ALBUJA, JUAN MARTIN", categoria: "ayuda" },
+      { id: 2, nombre: "ANGULO, JUAN JOSE", categoria: "avanzado" },
+      { id: 3, nombre: "BORJA, CAMILA RAPHAELA", categoria: "ayuda" },
+      { id: 4, nombre: "CONTRERAS, SAMUEL", categoria: "avanzado" },
+      { id: 5, nombre: "CORTÉS, BENJAMÍN", categoria: "promedio" },
+      { id: 6, nombre: "GALLARDO, NABILA", categoria: "ayuda" },
+      { id: 7, nombre: "GONZÁLEZ, EMILIA", categoria: "avanzado" },
+      { id: 8, nombre: "GUERRERO, LUCIANA", categoria: "avanzado" },
+      { id: 9, nombre: "JARAMILLO, ALEGRÍA", categoria: "ayuda" },
+      { id: 10, nombre: "LARREA, FIORELLA", categoria: "ayuda" },
+      { id: 11, nombre: "LARREA, MATEO", categoria: "avanzado" },
+      { id: 12, nombre: "LOOR, ALISSA SOPHIA", categoria: "promedio" },
+      { id: 13, nombre: "LÓPEZ, EMILIANO JOSÉ", categoria: "promedio" },
+      { id: 14, nombre: "MATA, CAYETANO", categoria: "promedio" },
+      { id: 15, nombre: "MELO, ABIGAIL MICAELA", categoria: "ayuda" },
+      { id: 16, nombre: "MOLINA, NICOLÁS", categoria: "ayuda" },
+      { id: 17, nombre: "SAMANIEGO, FERNANDA", categoria: "promedio" },
+      { id: 18, nombre: "SÁNCHEZ, RAPHAELLA CAROLINA", categoria: "ayuda" },
+      { id: 19, nombre: "SANCHEZ, JOSE ALEJANDRO", categoria: "avanzado" },
+      { id: 20, nombre: "SUÁREZ, PAULO", categoria: "avanzado" },
+      { id: 21, nombre: "TOBAR, AGUSTÍN", categoria: "ayuda" },
+      { id: 22, nombre: "TORRES, MATEO", categoria: "promedio" },
+      { id: 23, nombre: "TORRES, MARTINA", categoria: "avanzado" },
+      { id: 24, nombre: "TRUJILLO, SEBASTIÁN MATEO", categoria: "ayuda" }
+    ];
+
+    const grid = document.getElementById('grid');
+    let alumnoActualId = null;
+    let alumnoActualNombre = "";
+    let bitacorasGlobal = {};
+    let editandoIndice = null;
+    let gruposUltimos = [];
+    let puntajesGrupos = {};
+    let timerInterval = null;
+    let isTeacherMode = false;
+
+    window.toggleTeacherMode = function() {
+      isTeacherMode = document.getElementById('teacherModeToggle').checked;
+      const cards = document.querySelectorAll('.student-card');
+      cards.forEach(card => {
+        if (isTeacherMode) {
+          card.classList.add('teacher-mode');
+        } else {
+          card.classList.remove('teacher-mode');
+        }
+      });
+    };
+
+    function obtenerNombreParaGrupo(alumno, listaAlumnos) {
+      let apellido = "";
+      let primerNombre = "";
+
+      if (alumno.nombre.includes(',')) {
+        let partes = alumno.nombre.split(',');
+        apellido = partes[0].trim();
+        let nombresPartes = partes[1].trim().split(/\s+/);
+        primerNombre = nombresPartes[0];
+      } else {
+        let partes = alumno.nombre.trim().split(/\s+/);
+        apellido = partes[partes.length - 1];
+        primerNombre = partes[0];
+      }
+
+      let repetidos = listaAlumnos.filter(a => {
+        let pName = a.nombre.includes(',') ? a.nombre.split(',')[1].trim().split(/\
