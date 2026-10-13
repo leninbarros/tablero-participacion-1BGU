@@ -111,9 +111,10 @@
       grid-template-rows: repeat(4, 1fr);
       gap: 4px;
       padding: 4px;
-      flex-grow: 1;
+      flex: 1;
       width: 100%;
-      min-height: 0; /* CORRECCIÓN PARA QUE APAREZCA EN CELULARES */
+      height: 100%;
+      min-height: 0; /* COMPATIBLE CON MÓVILES Y LAPTOPS */
       overflow: hidden;
     }
 
@@ -707,7 +708,7 @@
       });
 
       if (repetidos.length > 1 && apellido.length > 0) {
-        return `${primerNombre} ${apellido.charAt(0)}.`;
+        return `${primerNombre}${apellido.charAt(0)}.`;
       }
 
       return primerNombre;
@@ -716,7 +717,7 @@
     function formatearNombre(nombresStr) {
       const partes = nombresStr.trim().split(/\s+/);
       if (partes.length > 1) {
-        return `${partes[0]} ${partes[1].charAt(0)}.`;
+        return `${partes[0]}${partes[1].charAt(0)}.`;
       }
       return nombresStr;
     }
@@ -946,7 +947,7 @@
           }
           doc.setFont("helvetica", "bold");
           doc.setTextColor(2, 132, 199);
-          doc.text(`Registro #${index + 1} - ${n.fecha}`, 14, yPos);
+          doc.text(`Registro #${index + 1} -${n.fecha}`, 14, yPos);
           
           doc.setFont("helvetica", "normal");
           doc.setTextColor(15, 23, 42);
@@ -1028,29 +1029,4 @@
 
         cardDiv.innerHTML = `
           <div class="group-card-header">
-            <h3>Grupo ${index + 1} (${g.length} pers.)</h3>
-            <button class="btn-copy-group" onclick="copiarGrupo(${index})">📋 Copiar</button>
-          </div>
-
-          <div class="digital-score-container" id="digital-container-${index}">
-            <button class="score-btn minus" onclick="modificarNota(${index}, -0.5)">-0.5</button>
-            <div class="digital-clock" id="score-clock-${index}">10.0</div>
-            <button class="score-btn plus" onclick="modificarNota(${index}, 0.5)">+0.5</button>
-          </div>
-
-          <div class="group-members-list">
-            ${htmlMembers}
-          </div>
-        `;
-        modalBody.appendChild(cardDiv);
-      });
-
-      document.getElementById('modalGrupos').classList.add('active');
-
-      // Iniciar la música de forma automática al generar grupos
-      document.getElementById('youtubeAudio').src = "https://www.youtube.com/embed/nETlIcLmSFU?autoplay=1";
-
-      iniciarTemporizador(120, grupos.length);
-    }
-
-    // FUNCIÓN DE EMERGENCIA PARA FORZAR AUDIO EN CEL
+            <h3>Grupo ${index + 1} (${g
