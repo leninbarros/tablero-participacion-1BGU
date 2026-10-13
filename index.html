@@ -580,10 +580,14 @@
     </div>
   </div>
 
-  <!-- REPRODUCTOR OCULTO DE YOUTUBE -->
+  <!-- ================================================================= -->
+  <!-- 🎵 ZONA DE MÚSICA: AQUÍ PUEDES CAMBIAR LA CANCIÓN DE YOUTUBE -->
+  <!-- ⚠️ PARA PONER OTRA CANCIÓN, REEMPLAZA SOLO EL ID "nETlIcLmSFU" -->
+  <!-- ================================================================= -->
   <div id="audioContainer">
     <iframe id="youtubeAudio" width="200" height="200" src="" frameborder="0" allow="autoplay"></iframe>
   </div>
+  <!-- ================================================================= -->
 
   <!-- MODAL DE BITÁCORA / EXPEDIENTE -->
   <div class="modal-overlay" id="modalBitacora">
@@ -973,7 +977,6 @@
       let total = lista.length;
       let i = 0;
 
-      // Generar estrictamente grupos de 3 mientras sea posible
       while (total - i >= 3) {
         let grupoActual = [];
         for (let j = 0; j < 3; j++) {
@@ -984,7 +987,6 @@
         grupos.push(grupoActual);
       }
 
-      // Si sobran alumnos (1 o 2), se agrupan juntos al final como residuo
       if (i < total) {
         let grupoSobrante = [];
         while (i < total) {
@@ -1036,8 +1038,11 @@
 
       document.getElementById('modalGrupos').classList.add('active');
 
-      document.getElementById('youtubeAudio').src = "https://www.youtube.com/embed/FQpXZG_u4hw?autoplay=1";
-
+      // =================================================================
+      // 🎵 REPRODUCCIÓN AUTOMÁTICA CON EL ID: nETlIcLmSFU
+      // =================================================================
+      document.getElementById('youtubeAudio').src = "https://www.youtube.com/embed/nETlIcLmSFU?autoplay=1";
+      
       iniciarTemporizador(120, grupos.length);
     }
 
@@ -1053,9 +1058,12 @@
 
         if (tiempoRestante <= 0) {
           clearInterval(timerInterval);
-          timerDisplay.textContent = "¡LISTOS!";
+          timerDisplay.textContent = "¡TIEMPO CUMPLIDO!";
+          
+          // Apagar la música al terminar el tiempo
           document.getElementById('youtubeAudio').src = "";
           
+          // Mostrar los contenedores de calificación digital
           for (let i = 0; i < totalGrupos; i++) {
             const container = document.getElementById(`digital-container-${i}`);
             if (container) container.style.display = 'flex';
@@ -1072,6 +1080,7 @@
       if (puntajesGrupos[grupoIdx] === undefined) puntajesGrupos[grupoIdx] = 10.0;
       puntajesGrupos[grupoIdx] += cambio;
       if (puntajesGrupos[grupoIdx] < 0) puntajesGrupos[grupoIdx] = 0;
+      if (puntajesGrupos[grupoIdx] > 10) puntajesGrupos[grupoIdx] = 10;
 
       const clock = document.getElementById(`score-clock-${grupoIdx}`);
       if (clock) clock.textContent = puntajesGrupos[grupoIdx].toFixed(1);
@@ -1079,26 +1088,28 @@
 
     window.copiarGrupo = function(index) {
       const g = gruposUltimos[index];
-      let texto = `*Grupo ${index + 1} (Nota: ${puntajesGrupos[index].toFixed(1)})*\n` + g.map(m => `- ${obtenerNombreParaGrupo(m, alumnos)}`).join('\n');
+      let notaActual = puntajesGrupos[index] !== undefined ? puntajesGrupos[index].toFixed(1) : "10.0";
+      let texto = `*Grupo ${index + 1} (Nota: ${notaActual})*\n` + g.map(m => `• ${obtenerNombreParaGrupo(m, alumnos)}`).join('\n');
       navigator.clipboard.writeText(texto).then(() => {
-        alert(`¡Grupo ${index + 1} copiado al portapapeles!`);
+        alert(`¡Copiado Grupo ${index + 1}!`);
       });
     }
 
     window.copiarTodosLosGrupos = function() {
-      let textoTotal = "EQUIPOS DE TRABAJO - 1 BGU\n\n";
+      let textoTotal = "";
       gruposUltimos.forEach((g, index) => {
-        textoTotal += `*Grupo ${index + 1} (Nota: ${puntajesGrupos[index].toFixed(1)})*\n` + g.map(m => `- ${obtenerNombreParaGrupo(m, alumnos)}`).join('\n') + "\n\n";
+        let notaActual = puntajesGrupos[index] !== undefined ? puntajesGrupos[index].toFixed(1) : "10.0";
+        textoTotal += `*Grupo ${index + 1} (Nota: ${notaActual})*\n` + g.map(m => `• ${obtenerNombreParaGrupo(m, alumnos)}`).join('\n') + `\n\n`;
       });
       navigator.clipboard.writeText(textoTotal.trim()).then(() => {
-        alert("¡Todos los grupos fueron copiados al portapapeles!");
+        alert("¡Todos los grupos han sido copiado al portapapeles!");
       });
     }
 
     window.cerrarModalGrupos = function() {
+      document.getElementById('modalGrupos').classList.remove('active');
       clearInterval(timerInterval);
       document.getElementById('youtubeAudio').src = "";
-      document.getElementById('modalGrupos').classList.remove('active');
     }
 
     cargarBitacorasNube();
