@@ -111,10 +111,9 @@
       grid-template-rows: repeat(4, 1fr);
       gap: 4px;
       padding: 4px;
-      flex: 1;
+      flex-grow: 1;
       width: 100%;
       height: 100%;
-      min-height: 0; /* COMPATIBLE CON MÓVILES Y LAPTOPS */
       overflow: hidden;
     }
 
@@ -417,8 +416,8 @@
     /* GRUPOS Y PANTALLA ÉPICA COMPACTA */
     .modal-actions-top {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
+      justify-content: flex-end;
+      gap: 6px;
       margin-bottom: 6px;
     }
 
@@ -569,14 +568,10 @@
         <button class="close-modal" onclick="cerrarModalGrupos()">×</button>
       </div>
       <div class="modal-actions-top">
-        <!-- BOTÓN DE EMERGENCIA PARA ACTIVAR MÚSICA EN CELULARES -->
-        <button class="action-btn" style="background-color: #a855f7; color: white; font-size: 11px; padding: 3px 8px;" onclick="forzarReproduccionMusica()">▶️ Reproducir Música</button>
         <button class="action-btn group-btn" style="font-size: 11px; padding: 3px 8px;" onclick="copiarTodosLosGrupos()">📋 Copiar Todos</button>
       </div>
       <div class="modal-body">
         <div class="epic-banner">
-          <!-- TEMÁTICA DE OCTUBRE / HALLOWEEN -->
-          <div style="font-size: 18px; margin-bottom: 2px;">🎃 👻 🦇</div>
           <div style="font-size: 11px; font-weight: bold; color: #c084fc; text-transform: uppercase;">¡Mueven mesas y sillas! Tiempo restante:</div>
           <div class="countdown-timer" id="timerDisplay">02:00</div>
         </div>
@@ -585,19 +580,14 @@
     </div>
   </div>
 
-  <!-- 
-    ========================================================================
-       ATENCIÓN PROFESOR: ZONA OFICIAL PARA CAMBIAR LA MÚSICA
-       
-       PARA PONER OTRA CANCIÓN DE YOUTUBE EN EL FUTURO:
-       1. Ve a YouTube y copia el ID del video (ejemplo: nETlIcLmSFU)
-       2. Reemplaza ÚNICAMENTE el código que está dentro de las comillas
-          en el atributo src del iframe de abajo.
-    ========================================================================
-  -->
+  <!-- ================================================================= -->
+  <!-- 🎵 ZONA DE MÚSICA: AQUÍ PUEDES CAMBIAR LA CANCIÓN DE YOUTUBE -->
+  <!-- ⚠️ PARA PONER OTRA CANCIÓN, REEMPLAZA SOLO EL ID "nETlIcLmSFU" -->
+  <!-- ================================================================= -->
   <div id="audioContainer">
     <iframe id="youtubeAudio" width="200" height="200" src="" frameborder="0" allow="autoplay"></iframe>
   </div>
+  <!-- ================================================================= -->
 
   <!-- MODAL DE BITÁCORA / EXPEDIENTE -->
   <div class="modal-overlay" id="modalBitacora">
@@ -708,7 +698,7 @@
       });
 
       if (repetidos.length > 1 && apellido.length > 0) {
-        return `${primerNombre}${apellido.charAt(0)}.`;
+        return `${primerNombre} ${apellido.charAt(0)}.`;
       }
 
       return primerNombre;
@@ -717,7 +707,7 @@
     function formatearNombre(nombresStr) {
       const partes = nombresStr.trim().split(/\s+/);
       if (partes.length > 1) {
-        return `${partes[0]}${partes[1].charAt(0)}.`;
+        return `${partes[0]} ${partes[1].charAt(0)}.`;
       }
       return nombresStr;
     }
@@ -947,7 +937,7 @@
           }
           doc.setFont("helvetica", "bold");
           doc.setTextColor(2, 132, 199);
-          doc.text(`Registro #${index + 1} -${n.fecha}`, 14, yPos);
+          doc.text(`Registro #${index + 1} - ${n.fecha}`, 14, yPos);
           
           doc.setFont("helvetica", "normal");
           doc.setTextColor(15, 23, 42);
@@ -1029,4 +1019,100 @@
 
         cardDiv.innerHTML = `
           <div class="group-card-header">
-            <h3>Grupo ${index + 1} (${g
+            <h3>Grupo ${index + 1} (${g.length} pers.)</h3>
+            <button class="btn-copy-group" onclick="copiarGrupo(${index})">📋 Copiar</button>
+          </div>
+
+          <div class="digital-score-container" id="digital-container-${index}">
+            <button class="score-btn minus" onclick="modificarNota(${index}, -0.5)">-0.5</button>
+            <div class="digital-clock" id="score-clock-${index}">10.0</div>
+            <button class="score-btn plus" onclick="modificarNota(${index}, 0.5)">+0.5</button>
+          </div>
+
+          <div class="group-members-list">
+            ${htmlMembers}
+          </div>
+        `;
+        modalBody.appendChild(cardDiv);
+      });
+
+      document.getElementById('modalGrupos').classList.add('active');
+
+      // =================================================================
+      // 🎵 REPRODUCCIÓN AUTOMÁTICA CON EL ID: nETlIcLmSFU
+      // =================================================================
+      document.getElementById('youtubeAudio').src = "https://www.youtube.com/embed/nETlIcLmSFU?autoplay=1";
+      
+      iniciarTemporizador(120, grupos.length);
+    }
+
+    function iniciarTemporizador(duracionSegundos, totalGrupos) {
+      clearInterval(timerInterval);
+      let tiempoRestante = duracionSegundos;
+      const timerDisplay = document.getElementById('timerDisplay');
+
+      function actualizarReloj() {
+        let minutos = Math.floor(tiempoRestante / 60);
+        let segundos = tiempoRestante % 60;
+        timerDisplay.textContent = `${minutos < 10 ? '0' : ''}${minutos}:${segundos < 10 ? '0' : ''}${segundos}`;
+
+        if (tiempoRestante <= 0) {
+          clearInterval(timerInterval);
+          timerDisplay.textContent = "¡TIEMPO CUMPLIDO!";
+          
+          // Apagar la música al terminar el tiempo
+          document.getElementById('youtubeAudio').src = "";
+          
+          // Mostrar los contenedores de calificación digital
+          for (let i = 0; i < totalGrupos; i++) {
+            const container = document.getElementById(`digital-container-${i}`);
+            if (container) container.style.display = 'flex';
+          }
+        }
+        tiempoRestante--;
+      }
+
+      actualizarReloj();
+      timerInterval = setInterval(actualizarReloj, 1000);
+    }
+
+    window.modificarNota = function(grupoIdx, cambio) {
+      if (puntajesGrupos[grupoIdx] === undefined) puntajesGrupos[grupoIdx] = 10.0;
+      puntajesGrupos[grupoIdx] += cambio;
+      if (puntajesGrupos[grupoIdx] < 0) puntajesGrupos[grupoIdx] = 0;
+      if (puntajesGrupos[grupoIdx] > 10) puntajesGrupos[grupoIdx] = 10;
+
+      const clock = document.getElementById(`score-clock-${grupoIdx}`);
+      if (clock) clock.textContent = puntajesGrupos[grupoIdx].toFixed(1);
+    };
+
+    window.copiarGrupo = function(index) {
+      const g = gruposUltimos[index];
+      let notaActual = puntajesGrupos[index] !== undefined ? puntajesGrupos[index].toFixed(1) : "10.0";
+      let texto = `*Grupo ${index + 1} (Nota: ${notaActual})*\n` + g.map(m => `• ${obtenerNombreParaGrupo(m, alumnos)}`).join('\n');
+      navigator.clipboard.writeText(texto).then(() => {
+        alert(`¡Copiado Grupo ${index + 1}!`);
+      });
+    }
+
+    window.copiarTodosLosGrupos = function() {
+      let textoTotal = "";
+      gruposUltimos.forEach((g, index) => {
+        let notaActual = puntajesGrupos[index] !== undefined ? puntajesGrupos[index].toFixed(1) : "10.0";
+        textoTotal += `*Grupo ${index + 1} (Nota: ${notaActual})*\n` + g.map(m => `• ${obtenerNombreParaGrupo(m, alumnos)}`).join('\n') + `\n\n`;
+      });
+      navigator.clipboard.writeText(textoTotal.trim()).then(() => {
+        alert("¡Todos los grupos han sido copiado al portapapeles!");
+      });
+    }
+
+    window.cerrarModalGrupos = function() {
+      document.getElementById('modalGrupos').classList.remove('active');
+      clearInterval(timerInterval);
+      document.getElementById('youtubeAudio').src = "";
+    }
+
+    cargarBitacorasNube();
+  </script>
+</body>
+</html>
