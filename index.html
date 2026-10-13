@@ -113,7 +113,7 @@
       padding: 4px;
       flex-grow: 1;
       width: 100%;
-      height: 100%;
+      min-height: 0; /* CORRECCIÓN PARA QUE APAREZCA EN CELULARES */
       overflow: hidden;
     }
 
@@ -930,4 +930,127 @@
       doc.text(`Fecha de emisión: ${new Date().toLocaleDateString()}`, 14, 45);
 
       doc.setDrawColor(56, 189, 248);
-      doc.line(14,
+      doc.line(14, 50, 196, 50);
+
+      let yPos = 60;
+      doc.setFontSize(10);
+
+      if (notas.length === 0) {
+        doc.setTextColor(100, 100, 100);
+        doc.text("No registra anotaciones ni compromisos previos en su bitácora.", 14, yPos);
+      } else {
+        notas.forEach((n, index) => {
+          if (yPos > 270) {
+            doc.addPage();
+            yPos = 20;
+          }
+          doc.setFont("helvetica", "bold");
+          doc.setTextColor(2, 132, 199);
+          doc.text(`Registro #${index + 1} - ${n.fecha}`, 14, yPos);
+          
+          doc.setFont("helvetica", "normal");
+          doc.setTextColor(15, 23, 42);
+          
+          const textoLineas = doc.splitTextToSize(n.texto, 180);
+          doc.text(textoLineas, 14, yPos + 5);
+          
+          yPos += (textoLineas.length * 5) + 10;
+        });
+      }
+
+      doc.save(`Bitacora_${alumnoActualNombre.replace(/[^a-zA-Z]/g, "_")}.pdf`);
+    }
+
+    function shuffle(array) {
+      let currentIndex = array.length, randomIndex;
+      while (currentIndex !== 0) {
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+        [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+      }
+      return array;
+    }
+
+    window.generarGrupos = function() {
+      const disponibles = alumnos.filter(a => !document.getElementById(`card-${a.id}`).classList.contains('used'));
+
+      if (disponibles.length === 0) {
+        alert("¡Todos los estudiantes ya han sido seleccionados o agrupados! Restaura el tablero si deseas volver a agrupar.");
+        return;
+      }
+
+      let lista = shuffle([...disponibles]);
+      let grupos = [];
+      let idsSeleccionados = [];
+
+      let total = lista.length;
+      let i = 0;
+
+      while (total - i >= 3) {
+        let grupoActual = [];
+        for (let j = 0; j < 3; j++) {
+          let alumnoObj = lista[i++];
+          grupoActual.push(alumnoObj);
+          idsSeleccionados.push(alumnoObj.id);
+        }
+        grupos.push(grupoActual);
+      }
+
+      if (i < total) {
+        let grupoSobrante = [];
+        while (i < total) {
+          let alumnoObj = lista[i++];
+          grupoSobrante.push(alumnoObj);
+          idsSeleccionados.push(alumnoObj.id);
+        }
+        grupos.push(grupoSobrante);
+      }
+
+      gruposUltimos = grupos;
+
+      grupos.forEach((_, idx) => {
+        if (puntajesGrupos[idx] === undefined) puntajesGrupos[idx] = 10.0;
+      });
+
+      idsSeleccionados.forEach(id => {
+        const card = document.getElementById(`card-${id}`);
+        if (card) card.classList.add('used');
+      });
+
+      const modalBody = document.getElementById('modalBodyGrupos');
+      modalBody.innerHTML = '';
+
+      grupos.forEach((g, index) => {
+        let cardDiv = document.createElement('div');
+        cardDiv.className = 'group-card';
+        
+        let htmlMembers = g.map(m => `<div class="group-member-name">${obtenerNombreParaGrupo(m, alumnos)}</div>`).join('');
+
+        cardDiv.innerHTML = `
+          <div class="group-card-header">
+            <h3>Grupo ${index + 1} (${g.length} pers.)</h3>
+            <button class="btn-copy-group" onclick="copiarGrupo(${index})">📋 Copiar</button>
+          </div>
+
+          <div class="digital-score-container" id="digital-container-${index}">
+            <button class="score-btn minus" onclick="modificarNota(${index}, -0.5)">-0.5</button>
+            <div class="digital-clock" id="score-clock-${index}">10.0</div>
+            <button class="score-btn plus" onclick="modificarNota(${index}, 0.5)">+0.5</button>
+          </div>
+
+          <div class="group-members-list">
+            ${htmlMembers}
+          </div>
+        `;
+        modalBody.appendChild(cardDiv);
+      });
+
+      document.getElementById('modalGrupos').classList.add('active');
+
+      // Iniciar la música de forma automática al generar grupos
+      document.getElementById('youtubeAudio').src = "https://www.youtube.com/embed/nETlIcLmSFU?autoplay=1";
+
+      iniciarTemporizador(120, grupos.length);
+    }
+
+    // FUNCIÓN DE EMERGENCIA PARA FORZAR AUDIO EN CEL
