@@ -416,8 +416,8 @@
     /* GRUPOS Y PANTALLA ÉPICA COMPACTA */
     .modal-actions-top {
       display: flex;
-      justify-content: flex-end;
-      gap: 6px;
+      justify-content: space-between;
+      align-items: center;
       margin-bottom: 6px;
     }
 
@@ -568,6 +568,8 @@
         <button class="close-modal" onclick="cerrarModalGrupos()">×</button>
       </div>
       <div class="modal-actions-top">
+        <!-- BOTÓN DE EMERGENCIA PARA ACTIVAR MÚSICA EN CELULARES -->
+        <button class="action-btn" style="background-color: #a855f7; color: white; font-size: 11px; padding: 3px 8px;" onclick="forzarReproduccionMusica()">▶️ Reproducir Música</button>
         <button class="action-btn group-btn" style="font-size: 11px; padding: 3px 8px;" onclick="copiarTodosLosGrupos()">📋 Copiar Todos</button>
       </div>
       <div class="modal-body">
@@ -580,14 +582,26 @@
     </div>
   </div>
 
-  <!-- ================================================================= -->
-  <!-- 🎵 ZONA DE MÚSICA: AQUÍ PUEDES CAMBIAR LA CANCIÓN DE YOUTUBE -->
-  <!-- ⚠️ PARA PONER OTRA CANCIÓN, REEMPLAZA SOLO EL ID "nETlIcLmSFU" -->
-  <!-- ================================================================= -->
+  /************************************************************************
+   *                                                                      *
+   *   ⚠️ ATENCIÓN PROFESOR: ZONA OFICIAL PARA CAMBIAR LA MÚSICA          *
+   *                                                                      *
+   *   PARA PONER OTRA CANCIÓN DE YOUTUBE EN EL FUTURO:                   *
+   *   1. Ve a YouTube y copia el ID del video (ejemplo: nETlIcLmSFU)       *
+   *   2. Reemplaza ÚNICAMENTE el código que está dentro de las comillas    *
+   *      en el atributo src del iframe de abajo.                         *
+   *                                                                      *
+   ************************************************************************/
+  
+  *************************************************************************
+  *************************************************************************
+  *************************************************************************
+  *************************************************************************
+  *************************************************************************
+
   <div id="audioContainer">
     <iframe id="youtubeAudio" width="200" height="200" src="" frameborder="0" allow="autoplay"></iframe>
   </div>
-  <!-- ================================================================= -->
 
   <!-- MODAL DE BITÁCORA / EXPEDIENTE -->
   <div class="modal-overlay" id="modalBitacora">
@@ -1038,12 +1052,16 @@
 
       document.getElementById('modalGrupos').classList.add('active');
 
-      // =================================================================
-      // 🎵 REPRODUCCIÓN AUTOMÁTICA CON EL ID: nETlIcLmSFU
-      // =================================================================
+      // Iniciar la música de forma automática al generar grupos
       document.getElementById('youtubeAudio').src = "https://www.youtube.com/embed/nETlIcLmSFU?autoplay=1";
-      
+
       iniciarTemporizador(120, grupos.length);
+    }
+
+    // FUNCIÓN DE EMERGENCIA PARA FORZAR AUDIO EN CELULARES
+    window.forzarReproduccionMusica = function() {
+      document.getElementById('youtubeAudio').src = "https://www.youtube.com/embed/nETlIcLmSFU?autoplay=1";
+      alert("¡Reproducción de audio activada!");
     }
 
     function iniciarTemporizador(duracionSegundos, totalGrupos) {
