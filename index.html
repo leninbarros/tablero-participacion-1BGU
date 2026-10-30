@@ -250,7 +250,7 @@
   </div>
 
   <div id="audioContainer">
-    <iframe id="youtubeAudio" width="200" height="200" src="" frameborder="0" allow="autoplay"></iframe>
+<iframe id="youtubeAudio" width="200" height="200" src="" frameborder="0" allow="autoplay; encrypted-media"></iframe>
   </div>
 
   <div class="modal-overlay" id="modalBitacora">
@@ -695,8 +695,7 @@
       });
 
       document.getElementById('modalGrupos').classList.add('active');
-      document.getElementById('youtubeAudio').src = "https://www.youtube.com/embed/gjSQFQB_I7I?autoplay=1";
-      iniciarTemporizador(120, grupos.length);
+document.getElementById('youtubeAudio').src = "https://www.youtube.com/embed/IIBMKoU6KYQ?autoplay=1&enablejsapi=1";      iniciarTemporizador(120, grupos.length);
     }
 
     function iniciarTemporizador(duracionSegundos, totalGrupos) {
