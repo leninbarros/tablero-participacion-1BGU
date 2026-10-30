@@ -150,15 +150,15 @@
       border: 1px solid #a855f7; border-radius: 6px; padding: 10px 6px; margin-bottom: 6px;
       position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden;
     }
-    .snowman-container {
+    .halloween-ghost-container {
       position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
-      display: flex; align-items: center; animation: moveSnowmanAcross 4s ease-in-out infinite alternate; pointer-events: none;
+      display: flex; align-items: center; animation: moveGhostAcross 4s ease-in-out infinite alternate; pointer-events: none;
     }
-    @keyframes moveSnowmanAcross {
+    @keyframes moveGhostAcross {
       0% { transform: translate(0, -50%) translateY(0) scaleX(1); }
-      48% { transform: translate(calc(100vw - 120px), -50%) translateY(-4px) scaleX(1); }
+      48% { transform: translate(calc(100vw - 120px), -50%) translateY(-6px) scaleX(1); }
       50% { transform: translate(calc(100vw - 120px), -50%) translateY(0) scaleX(-1); }
-      98% { transform: translate(0, -50%) translateY(4px) scaleX(-1); }
+      98% { transform: translate(0, -50%) translateY(6px) scaleX(-1); }
       100% { transform: translate(0, -50%) translateY(0) scaleX(1); }
     }
     .countdown-timer {
@@ -232,8 +232,8 @@
       </div>
       <div class="modal-body">
         <div class="epic-banner">
-          <div class="snowman-container">
-            <!-- Muñeco de Nieve SVG Navideño -->
+          <div class="halloween-ghost-container">
+            <!-- Muñeco de Nieve Navideño -->
             <svg width="42" height="42" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
               <circle cx="32" cy="46" r="14" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
               <circle cx="32" cy="26" r="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
@@ -257,7 +257,7 @@
   </div>
 
   <div id="audioContainer">
-    <iframe id="youtubeAudio" width="200" height="200" src="" frameborder="0" allow="autoplay"></iframe>
+    <iframe id="youtubeAudio" width="200" height="200" src="" frameborder="0" allow="autoplay; encrypted-media"></iframe>
   </div>
 
   <div class="modal-overlay" id="modalBitacora">
@@ -324,4 +324,449 @@
       { id: 24, nombre: "TRUJILLO, SEBASTIÁN MATEO", categoria: "ayuda" }
     ];
 
-    const grid
+    const grid = document.getElementById('grid');
+    let alumnoActualId = null;
+    let alumnoActualNombre = "";
+    let bitacorasGlobal = {};
+    let editandoIndice = null;
+    let gruposUltimos = [];
+    let puntajesGrupos = {};
+    let timerInterval = null;
+    let isTeacherMode = false;
+
+    window.toggleTeacherMode = function() {
+      isTeacherMode = document.getElementById('teacherModeToggle').checked;
+      const cards = document.querySelectorAll('.student-card');
+      cards.forEach(card => {
+        if (isTeacherMode) {
+          card.classList.add('teacher-mode');
+        } else {
+          card.classList.remove('teacher-mode');
+        }
+      });
+    };
+
+    function obtenerNombreParaGrupo(alumno, listaAlumnos) {
+      let apellido = "";
+      let primerNombre = "";
+
+      if (alumno.nombre.includes(',')) {
+        let partes = alumno.nombre.split(',');
+        apellido = partes[0].trim();
+        let nombresPartes = partes[1].trim().split(/\s+/);
+        primerNombre = nombresPartes[0];
+      } else {
+        let partes = alumno.nombre.trim().split(/\s+/);
+        apellido = partes[partes.length - 1];
+        primerNombre = partes[0];
+      }
+
+      let repetidos = listaAlumnos.filter(a => {
+        let pName = a.nombre.includes(',') ? a.nombre.split(',')[1].trim().split(/\s+/)[0] : a.nombre.trim().split(/\s+/)[0];
+        return pName === primerNombre;
+      });
+
+      if (repetidos.length > 1 && apellido.length > 0) {
+        return `${primerNombre} ${apellido.charAt(0)}.`;
+      }
+
+      return primerNombre;
+    }
+
+    function formatearNombre(nombresStr) {
+      const partes = nombresStr.trim().split(/\s+/);
+      if (partes.length > 1) {
+        return `${partes[0]} ${partes[1].charAt(0)}.`;
+      }
+      return nombresStr;
+    }
+
+    async function cargarBitacorasNube() {
+      try {
+        const querySnapshot = await getDocs(collection(db, "bitacoras_1bgu"));
+        querySnapshot.forEach((docSnap) => {
+          bitacorasGlobal[String(docSnap.id)] = docSnap.data().notas || [];
+        });
+        actualizarIndicadoresNotas();
+      } catch (e) {
+        console.error("Error cargando bitácoras de 1 BGU: ", e);
+      }
+    }
+
+    function actualizarIndicadoresNotas() {
+      alumnos.forEach(alumno => {
+        const card = document.getElementById(`card-${alumno.id}`);
+        if (card) {
+          const notasAlumno = bitacorasGlobal[String(alumno.id)] || [];
+          if (notasAlumno.length > 0) {
+            card.classList.add('has-notes');
+          } else {
+            card.classList.remove('has-notes');
+          }
+        }
+      });
+    }
+
+    alumnos.forEach((alumno) => {
+      const [apellido, nombresOriginales] = alumno.nombre.split(', ');
+      const nombresFormateados = formatearNombre(nombresOriginales);
+      const numStr = alumno.id < 10 ? `0${alumno.id}` : alumno.id;
+      
+      const card = document.createElement('div');
+      const catClass = `cat-${alumno.categoria}`;
+      card.className = `student-card ${catClass}`;
+      card.id = `card-${alumno.id}`;
+
+      const estrellaHtml = '<div class="star-badge">★</div>';
+
+      card.innerHTML = `
+        <div class="note-indicator"></div>
+        ${estrellaHtml}
+        <div class="number-lastname-row">
+          <div class="student-number">${numStr}</div>
+          <div class="student-lastname" title="${apellido}">${apellido}</div>
+        </div>
+        <div class="student-name" title="${nombresOriginales}">${nombresFormateados}</div>
+      `;
+
+      let pressTimer = null;
+      const startPress = () => {
+        pressTimer = setTimeout(() => {
+          if (isTeacherMode) {
+            abrirBitacora(alumno.id, alumno.nombre);
+          }
+        }, 600);
+      };
+      const cancelPress = () => clearTimeout(pressTimer);
+
+      card.addEventListener('mousedown', startPress);
+      card.addEventListener('mouseup', cancelPress);
+      card.addEventListener('mouseleave', cancelPress);
+      card.addEventListener('touchstart', startPress);
+      card.addEventListener('touchend', cancelPress);
+      card.addEventListener('click', () => { toggleStatus(alumno.id); });
+
+      grid.appendChild(card);
+    });
+
+    window.toggleStatus = function(id) {
+      document.getElementById(`card-${id}`).classList.toggle('used');
+    }
+
+    window.resetAll = function() {
+      alumnos.forEach((alumno) => {
+        document.getElementById(`card-${alumno.id}`).classList.remove('used');
+      });
+      puntajesGrupos = {};
+    }
+
+    window.abrirBitacora = function(id, nombreCompleto) {
+      if (!isTeacherMode) return;
+      alumnoActualId = String(id);
+      alumnoActualNombre = nombreCompleto;
+      editandoIndice = null;
+      document.getElementById('tituloBitacora').innerText = `Bitácora: ${nombreCompleto}`;
+      document.getElementById('textoNuevaNota').value = '';
+      document.getElementById('labelEditorNota').innerText = "Agregar nueva nota o compromiso:";
+      document.getElementById('btnGuardarNota').innerText = "💾 Guardar Nota";
+      renderizarHistorialNotas();
+      document.getElementById('modalBitacora').classList.add('active');
+    }
+
+    window.cerrarModalBitacora = function() {
+      document.getElementById('modalBitacora').classList.remove('active');
+      actualizarIndicadoresNotas();
+    }
+
+    function renderizarHistorialNotas() {
+      const lista = document.getElementById('historialLista');
+      lista.innerHTML = '';
+      const notas = bitacorasGlobal[alumnoActualId] || [];
+
+      if (notas.length === 0) {
+        lista.innerHTML = '<div style="color: #64748b; font-size: 12px; text-align: center; padding: 8px;">No hay notas registradas todavía.</div>';
+        return;
+      }
+
+      notas.forEach((n, idx) => {
+        let div = document.createElement('div');
+        div.className = 'nota-item';
+        div.innerHTML = `
+          <div class="nota-header-row">
+            <span class="nota-fecha">📅 ${n.fecha}</span>
+            <div class="nota-acciones">
+              <button class="btn-acc btn-editar" onclick="prepararEdicionNota(${idx})">✏️ Editar</button>
+              <button class="btn-acc btn-eliminar" onclick="eliminarNotaBitacora(${idx})">🗑️ Eliminar</button>
+            </div>
+          </div>
+          <div>${n.texto}</div>
+        `;
+        lista.appendChild(div);
+      });
+    }
+
+    window.guardarNotaBitacora = async function() {
+      const texto = document.getElementById('textoNuevaNota').value.trim();
+      if (!texto) return alert("Escribe una nota antes de guardar.");
+
+      if (!bitacorasGlobal[alumnoActualId]) {
+        bitacorasGlobal[alumnoActualId] = [];
+      }
+
+      const ahora = new Date();
+      const fechaFormateada = ahora.toLocaleDateString() + ' ' + ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      if (editandoIndice !== null) {
+        bitacorasGlobal[alumnoActualId][editandoIndice].texto = texto;
+        bitacorasGlobal[alumnoActualId][editandoIndice].fecha = fechaFormateada + " (Modificada)";
+        editandoIndice = null;
+        document.getElementById('labelEditorNota').innerText = "Agregar nueva nota o compromiso:";
+        document.getElementById('btnGuardarNota').innerText = "💾 Guardar Nota";
+      } else {
+        bitacorasGlobal[alumnoActualId].push({
+          texto: texto,
+          fecha: fechaFormateada
+        });
+      }
+
+      try {
+        await setDoc(doc(db, "bitacoras_1bgu", alumnoActualId), {
+          notas: bitacorasGlobal[alumnoActualId]
+        });
+        document.getElementById('textoNuevaNota').value = '';
+        renderizarHistorialNotas();
+        actualizarIndicadoresNotas();
+      } catch (e) {
+        console.error("Error al guardar en Firebase: ", e);
+        alert("Hubo un error al guardar en la nube.");
+      }
+    }
+
+    window.prepararEdicionNota = function(idx) {
+      editandoIndice = idx;
+      const nota = (bitacorasGlobal[alumnoActualId] || [])[idx];
+      document.getElementById('textoNuevaNota').value = nota.texto;
+      document.getElementById('labelEditorNota').innerText = `Editando nota #${idx + 1}:`;
+      document.getElementById('btnGuardarNota').innerText = "💾 Actualizar Nota";
+      document.getElementById('textoNuevaNota').focus();
+    }
+
+    window.eliminarNotaBitacora = async function(idx) {
+      if (!confirm("¿Estás seguro de eliminar esta nota?")) return;
+
+      const notasArr = bitacorasGlobal[alumnoActualId] || [];
+      notasArr.splice(idx, 1);
+      
+      try {
+        await setDoc(doc(db, "bitacoras_1bgu", alumnoActualId), {
+          notas: notasArr
+        });
+        renderizarHistorialNotas();
+        actualizarIndicadoresNotas();
+      } catch (e) {
+        console.error("Error al eliminar nota: ", e);
+      }
+    }
+
+    window.descargarPDFBitacora = function() {
+      const { jsPDF } = window.jspdf;
+      const docPdf = new jsPDF();
+      const notas = bitacorasGlobal[alumnoActualId] || [];
+
+      docPdf.setFillColor(30, 41, 59);
+      docPdf.rect(0, 0, 210, 25, "F");
+
+      docPdf.setTextColor(255, 255, 255);
+      docPdf.setFont("helvetica", "bold");
+      docPdf.setFontSize(14);
+      docPdf.text("REPORTE DE SEGUIMIENTO - 1 BGU", 14, 16);
+
+      docPdf.setTextColor(15, 23, 42);
+      docPdf.setFontSize(11);
+      docPdf.text(`Estudiante: ${alumnoActualNombre}`, 14, 38);
+      docPdf.text(`Fecha de emisión: ${new Date().toLocaleDateString()}`, 14, 45);
+
+      docPdf.setDrawColor(56, 189, 248);
+      docPdf.line(14, 50, 196, 50);
+
+      let yPos = 60;
+      docPdf.setFontSize(10);
+
+      if (notas.length === 0) {
+        docPdf.setTextColor(100, 100, 100);
+        docPdf.text("No registra anotaciones ni compromisos previos en su bitácora.", 14, yPos);
+      } else {
+        notas.forEach((n, index) => {
+          if (yPos > 270) {
+            docPdf.addPage();
+            yPos = 20;
+          }
+          docPdf.setFont("helvetica", "bold");
+          docPdf.setTextColor(2, 132, 199);
+          docPdf.text(`Registro #${index + 1} - ${n.fecha}`, 14, yPos);
+          
+          docPdf.setFont("helvetica", "normal");
+          docPdf.setTextColor(15, 23, 42);
+          
+          const textoLineas = docPdf.splitTextToSize(n.texto, 180);
+          docPdf.text(textoLineas, 14, yPos + 5);
+          
+          yPos += (textoLineas.length * 5) + 10;
+        });
+      }
+
+      docPdf.save(`Bitacora_1BGU_${alumnoActualNombre.replace(/[^a-zA-Z]/g, "_")}.pdf`);
+    }
+
+    function shuffle(array) {
+      let currentIndex = array.length, randomIndex;
+      while (currentIndex !== 0) {
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+        [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+      }
+      return array;
+    }
+
+    window.generarGrupos = function() {
+      const disponibles = alumnos.filter(a => !document.getElementById(`card-${a.id}`).classList.contains('used'));
+
+      if (disponibles.length === 0) {
+        alert("¡Todos los estudiantes ya han sido seleccionados o agrupados! Restaura el tablero si deseas volver a agrupar.");
+        return;
+      }
+
+      let lista = shuffle([...disponibles]);
+      let grupos = [];
+      let idsSeleccionados = [];
+
+      let total = lista.length;
+      let i = 0;
+
+      while (total - i >= 3) {
+        let grupoActual = [];
+        for (let j = 0; j < 3; j++) {
+          let alumnoObj = lista[i++];
+          grupoActual.push(alumnoObj);
+          idsSeleccionados.push(alumnoObj.id);
+        }
+        grupos.push(grupoActual);
+      }
+
+      if (i < total) {
+        let grupoSobrante = [];
+        while (i < total) {
+          let alumnoObj = lista[i++];
+          grupoSobrante.push(alumnoObj);
+          idsSeleccionados.push(alumnoObj.id);
+        }
+        grupos.push(grupoSobrante);
+      }
+
+      gruposUltimos = grupos;
+
+      grupos.forEach((_, idx) => {
+        if (puntajesGrupos[idx] === undefined) puntajesGrupos[idx] = 10.0;
+      });
+
+      idsSeleccionados.forEach(id => {
+        document.getElementById(`card-${id}`).classList.add('used');
+      });
+
+      const modalBody = document.getElementById('modalBodyGrupos');
+      modalBody.innerHTML = '';
+
+      grupos.forEach((g, index) => {
+        let cardDiv = document.createElement('div');
+        cardDiv.className = 'group-card';
+        
+        let htmlMembers = g.map(m => `<div class="group-member-name">${obtenerNombreParaGrupo(m, alumnos)}</div>`).join('');
+
+        cardDiv.innerHTML = `
+          <div class="group-card-header">
+            <h3>Grupo ${index + 1} (${g.length} pers.)</h3>
+            <button class="btn-copy-group" onclick="copiarGrupo(${index})">📋 Copiar</button>
+          </div>
+
+          <div class="digital-score-container" id="digital-container-${index}">
+            <button class="score-btn minus" onclick="modificarNota(${index}, -0.5)">-0.5</button>
+            <div class="digital-clock" id="score-clock-${index}">10.0</div>
+            <button class="score-btn plus" onclick="modificarNota(${index}, 0.5)">+0.5</button>
+          </div>
+
+          <div class="group-members-list">
+            ${htmlMembers}
+          </div>
+        `;
+        modalBody.appendChild(cardDiv);
+      });
+
+      document.getElementById('modalGrupos').classList.add('active');
+      document.getElementById('youtubeAudio').src = "https://www.youtube.com/embed/IIBMKoU6KYQ?autoplay=1&enablejsapi=1";
+      iniciarTemporizador(120, grupos.length);
+    }
+
+    function iniciarTemporizador(duracionSegundos, totalGrupos) {
+      clearInterval(timerInterval);
+      let tiempoRestante = duracionSegundos;
+      const timerDisplay = document.getElementById('timerDisplay');
+
+      function actualizarReloj() {
+        let minutos = Math.floor(tiempoRestante / 60);
+        let segundos = tiempoRestante % 60;
+        timerDisplay.textContent = `${minutos < 10 ? '0' : ''}${minutos}:${segundos < 10 ? '0' : ''}${segundos}`;
+
+        if (tiempoRestante <= 0) {
+          clearInterval(timerInterval);
+          timerDisplay.textContent = "¡LISTOS!";
+          document.getElementById('youtubeAudio').src = "";
+          
+          for (let i = 0; i < totalGrupos; i++) {
+            const container = document.getElementById(`digital-container-${i}`);
+            if (container) container.style.display = 'flex';
+          }
+        }
+        tiempoRestante--;
+      }
+
+      actualizarReloj();
+      timerInterval = setInterval(actualizarReloj, 1000);
+    }
+
+    window.modificarNota = function(grupoIdx, cambio) {
+      if (puntajesGrupos[grupoIdx] === undefined) puntajesGrupos[grupoIdx] = 10.0;
+      puntajesGrupos[grupoIdx] += cambio;
+      if (puntajesGrupos[grupoIdx] < 0) puntajesGrupos[grupoIdx] = 0;
+
+      const clock = document.getElementById(`score-clock-${grupoIdx}`);
+      if (clock) clock.textContent = puntajesGrupos[grupoIdx].toFixed(1);
+    };
+
+    window.copiarGrupo = function(index) {
+      const g = gruposUltimos[index];
+      let texto = `*Grupo ${index + 1} (Nota: ${puntajesGrupos[index].toFixed(1)})*\n` + g.map(m => `- ${obtenerNombreParaGrupo(m, alumnos)}`).join('\n');
+      navigator.clipboard.writeText(texto).then(() => {
+        alert(`¡Grupo ${index + 1} copiado al portapapeles!`);
+      });
+    }
+
+    window.copiarTodosLosGrupos = function() {
+      let textoTotal = "EQUIPOS DE TRABAJO - 1 BGU\n\n";
+      gruposUltimos.forEach((g, index) => {
+        textoTotal += `*Grupo ${index + 1} (Nota: ${puntajesGrupos[index].toFixed(1)})*\n` + g.map(m => `- ${obtenerNombreParaGrupo(m, alumnos)}`).join('\n') + "\n\n";
+      });
+      navigator.clipboard.writeText(textoTotal.trim()).then(() => {
+        alert("¡Todos los grupos fueron copiados al portapapeles!");
+      });
+    }
+
+    window.cerrarModalGrupos = function() {
+      clearInterval(timerInterval);
+      document.getElementById('youtubeAudio').src = "";
+      document.getElementById('modalGrupos').classList.remove('active');
+    }
+
+    cargarBitacorasNube();
+  </script>
+</body>
+</html>
